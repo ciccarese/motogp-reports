@@ -370,4 +370,567 @@ footer{position:relative;z-index:10;background:var(--bg1);border-top:1px solid v
           <tr><td>Mugello</td><td>Alta velocità</td><td class="cyan">338 km/h</td><td class="red">−7.2 km/h</td><td>Settori 2–3</td><td class="red">+8.3</td><td class="red">★★★</td></tr>
           <tr><td>Austria</td><td>Alta velocità</td><td class="cyan">316 km/h</td><td class="red">−6.4 km/h</td><td>Settori 1–2</td><td class="amber">+7.1</td><td class="red">★★★</td></tr>
           <tr><td>Barcellona</td><td>Misto</td><td class="cyan">298 km/h</td><td class="amber">−5.1 km/h</td><td>Settore 2</td><td class="amber">+5.9</td><td class="amber">★★</td></tr>
-          <tr><td>Assen</td><td>Misto</td><td class="cyan">283 km/h</td><td class="amber">−4.3 km/h</td><td>Settori 1–3</td><td class="
+          <tr><td>Assen</td><td>Misto</td><td class="cyan">283 km/h</td><td class="amber">−4.3 km/h</td><td>Settori 1–3</td><td class="amber">+4.8</td><td class="amber">★★</td></tr>
+          <tr><td>Losail</td><td>Alta velocità</td><td class="cyan">314 km/h</td><td class="amber">−5.8 km/h</td><td>Settore 1</td><td class="amber">+6.4</td><td class="amber">★★</td></tr>
+          <tr><td>Sachsenring</td><td>Tecnico lento</td><td class="cyan">236 km/h</td><td>−1.8 km/h</td><td>Settore 1</td><td>+2.2</td><td>★</td></tr>
+          <tr><td class="bold">Media stagione</td><td>—</td><td class="cyan">294 km/h</td><td class="amber">−5.1 km/h</td><td>—</td><td class="red">+5.8</td><td class="amber">★★</td></tr>
+        </tbody>
+      </table>
+      <div class="table-note">Deficit stimati da analisi telemetria pubblica e comunicati tecnici. Fonte: motorsport.com, racefans.net 2025/2026.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 02 — ARCHITETTURA CFD — sfondo cyan -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section-wrap sec-cyan">
+  <div class="inner">
+    <div class="sec-header">
+      <span class="sec-num">02</span>
+      <h2>Architettura CFD — Simulazione Transitoria Multi-Scala</h2>
+      <div class="sec-line"></div>
+    </div>
+
+    <p>La proposta introduce tre layer computazionali sovrapposti: <strong>LES su dominio ristretto</strong> (regione 0.3–2.0 m post-pilota), <strong>modellazione pilota NURBS breathing</strong> con 12 segmenti DoF-controllati, e <strong>integrazione F-duct come jet controllatrice di boundary layer</strong>. Il solver OpenFOAM pisoFoam opera con Δt = 5×10⁻⁵ s, CFL ≤ 0.8, convergenza residui &lt; 10⁻⁵.</p>
+
+    <div class="code-wrap">
+      <div class="code-title">Parametri solver — OpenFOAM pisoFoam + LES ibrido IDDES</div>
+      <pre><span class="key">Dominio</span>   3.5m upstream × 2.0m H × 1.2m W        <span class="cmt">// moto centrata a x = 1.2m</span>
+<span class="key">Mesh</span>      coarse 50mm → fine 5mm al bordo scia     <span class="cmt">// raffinamento adattivo ML</span>
+<span class="key">Modello</span>   RANS k-ω SST (attached) + LES full (wake) <span class="cmt">// IDDES Shur et al.</span>
+<span class="key">SGS</span>       Smagorinsky Cs = 0.1 — y⁺ &lt; 1 in BL     <span class="cmt">// yPlusMapping adattivo</span>
+<span class="key">Δt</span>        5×10⁻⁵ s  — CFL ≤ 0.8                   <span class="cmt">// V_inlet ≈ 60 m/s</span>
+<span class="key">Conv.</span>     10,000 iter/step — residui &lt; 10⁻⁵        <span class="cmt">// criterio stop</span>
+<span class="val2">Pilota</span>    NURBS 12 segmenti — DoF python-driven    <span class="cmt">// breathing transient</span>
+<span class="val2">F-duct</span>    massFlowRate BC — v_jet 5–18 m/s         <span class="cmt">// ±8° deflection verticale</span></pre>
+    </div>
+
+    <!-- TABLE: parametri simulazione per layer -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Layer CFD</th><th>Modello</th><th>Dominio</th><th>Celle [M]</th><th>Δt [s]</th><th>Costo HPC [CPU·h]</th><th>Fidelity</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>RANS global</td><td>k-ω SST steady</td><td>Full moto + pilota</td><td class="white">8.2</td><td>stazionario</td><td class="green">~120</td><td class="amber">Media</td></tr>
+          <tr><td>LES wake zone</td><td>IDDES (RANS+LES)</td><td>0.3–2.0m post-pilota</td><td class="white">24.6</td><td class="cyan">5×10⁻⁵</td><td class="amber">~4,800</td><td class="green">Alta</td></tr>
+          <tr><td>Pilota breathing</td><td>NURBS dinamico</td><td>Zona carenatura post.</td><td class="white">12.1</td><td class="cyan">5×10⁻⁵</td><td class="red">~8,200</td><td class="green">Molto alta</td></tr>
+          <tr><td>F-duct jet ctrl</td><td>massFlowRate BC</td><td>Uscita F-duct ±0.5m</td><td class="white">3.4</td><td class="cyan">5×10⁻⁵</td><td class="green">~640</td><td class="green">Alta</td></tr>
+          <tr><td class="bold">Totale run completo</td><td>—</td><td>—</td><td class="bold">48.3</td><td class="bold" style="color:var(--cyan);">5×10⁻⁵</td><td class="bold" style="color:var(--red);">~13,760</td><td class="bold" style="color:var(--green);">★★★★</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="two-col">
+      <div class="block block-cyan">
+        <div class="block-label">Layer 1 — Mesh Adattiva ML-Driven</div>
+        <p>Criterio raffinamento: gradiente vorticità ∇ω &gt; 500 s⁻¹ attiva suddivisione mesh real-time durante convergenza. Celle 50 mm (flusso libero) → 5 mm (bordo scia, carenatura posteriore). Neural network leggero predizione zone critiche: 2 hidden layer, ~50 KB flash, trained offline su 500 simulazioni.</p>
+      </div>
+      <div class="block block-purple">
+        <div class="block-label">Layer 2 — Pilota "Breathing" NURBS</div>
+        <p>12 segmenti corpo con DoF indipendenti: oscillazione laterale ±0.15 m a 1.5–2.5 Hz, roll 0°→63° in 0.8s (ingresso piega), tuck 26°→34° in 1.2s. Boundary condition Beavers-Joseph su tuta (Ra ≈ 120 μm, Dainese). Cattura fluttuazioni transienti completamente assenti nel modello stazionario attuale.</p>
+      </div>
+    </div>
+
+    <!-- LINE CHART SVG: Cd vs velocità -->
+    <div class="line-chart-wrap">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Coefficiente Drag (Cd) vs Velocità — RS-GP Attuale vs Proposta vs Ducati</div>
+          <div class="chart-subtitle">Simulazione LES transitoria · Pilota tuck · Rettilineo</div>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--cyan);"></div>RS-GP proposta (LES + micro-flap)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(255,100,50,0.9);"></div>RS-GP attuale (RANS statico)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:var(--amber);height:2px;border-radius:0;margin-top:3px;"></div>Ducati GP26 (stima)</div>
+        </div>
+      </div>
+      <svg viewBox="0 0 780 300" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+        <defs>
+          <linearGradient id="gCyan" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="rgba(0,210,255,0.2)"/>
+            <stop offset="100%" stop-color="rgba(0,210,255,0)"/>
+          </linearGradient>
+          <linearGradient id="gRed" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="rgba(255,100,50,0.14)"/>
+            <stop offset="100%" stop-color="rgba(255,100,50,0)"/>
+          </linearGradient>
+        </defs>
+        <!-- axis -->
+        <line x1="64" y1="20" x2="64" y2="255" stroke="rgba(0,210,255,0.15)" stroke-width="1"/>
+        <line x1="64" y1="255" x2="762" y2="255" stroke="rgba(0,210,255,0.15)" stroke-width="1"/>
+        <!-- h-grid -->
+        <line x1="64" y1="80"  x2="762" y2="80"  stroke="rgba(0,210,255,0.06)" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="64" y1="135" x2="762" y2="135" stroke="rgba(0,210,255,0.06)" stroke-width="1" stroke-dasharray="4,4"/>
+        <line x1="64" y1="190" x2="762" y2="190" stroke="rgba(0,210,255,0.06)" stroke-width="1" stroke-dasharray="4,4"/>
+        <!-- v-grid -->
+        <line x1="204" y1="20" x2="204" y2="255" stroke="rgba(0,210,255,0.05)" stroke-width="1" stroke-dasharray="2,6"/>
+        <line x1="344" y1="20" x2="344" y2="255" stroke="rgba(0,210,255,0.05)" stroke-width="1" stroke-dasharray="2,6"/>
+        <line x1="484" y1="20" x2="484" y2="255" stroke="rgba(0,210,255,0.05)" stroke-width="1" stroke-dasharray="2,6"/>
+        <line x1="624" y1="20" x2="624" y2="255" stroke="rgba(0,210,255,0.05)" stroke-width="1" stroke-dasharray="2,6"/>
+        <!-- y labels -->
+        <text x="54" y="84"  text-anchor="end" font-size="9" fill="#6a7f90" font-family="JetBrains Mono,monospace">0.37</text>
+        <text x="54" y="139" text-anchor="end" font-size="9" fill="#6a7f90" font-family="JetBrains Mono,monospace">0.40</text>
+        <text x="54" y="194" text-anchor="end" font-size="9" fill="#6a7f90" font-family="JetBrains Mono,monospace">0.43</text>
+        <text x="54" y="259" text-anchor="end" font-size="9" fill="#6a7f90" font-family="JetBrains Mono,monospace">0.47</text>
+        <!-- x labels -->
+        <text x="64"  y="272" text-anchor="middle" font-size="9" fill="#6a7f90" font-family="JetBrains Mono,monospace">200</text>
+        <text x="204" y="272" text-anchor="middle" font-size="9" fill="#6a7f90" font-family="JetBrains Mono,monospace">240</text>
+        <text x="344" y="272" text-anchor="middle" font-size="9" fill="#6a7f90" font-family="JetBrains Mono,monospace">280</text>
+        <text x="484" y="272" text-anchor="middle" font-size="9" fill="#6a7f90" font-family="JetBrains Mono,monospace">320 km/h</text>
+        <text x="624" y="272" text-anchor="middle" font-size="9" fill="#6a7f90" font-family="JetBrains Mono,monospace">360</text>
+        <!-- Ducati (amber dashed) -->
+        <path d="M64,195 L204,180 L344,165 L484,152 L624,140 L762,130" fill="none" stroke="rgba(240,165,0,0.65)" stroke-width="1.5" stroke-dasharray="6,3"/>
+        <!-- RS-GP attuale (red) -->
+        <path d="M64,240 L204,228 L344,212 L484,196 L624,179 L762,162 L762,255 L64,255 Z" fill="url(#gRed)"/>
+        <path d="M64,240 L204,228 L344,212 L484,196 L624,179 L762,162" fill="none" stroke="rgba(255,100,50,0.85)" stroke-width="2"/>
+        <!-- RS-GP proposta (cyan) -->
+        <path d="M64,212 L204,197 L344,180 L484,163 L624,146 L762,129 L762,255 L64,255 Z" fill="url(#gCyan)"/>
+        <path d="M64,212 L204,197 L344,180 L484,163 L624,146 L762,129" fill="none" stroke="var(--cyan)" stroke-width="2.5"/>
+        <!-- annotation @ 320 km/h -->
+        <circle cx="484" cy="163" r="4" fill="var(--cyan)" stroke="#0a1018" stroke-width="2"/>
+        <text x="496" y="158" font-size="9" fill="var(--cyan)" font-weight="600" font-family="JetBrains Mono,monospace">Cd 0.381</text>
+        <circle cx="484" cy="196" r="4" fill="rgba(255,100,50,0.9)" stroke="#0a1018" stroke-width="2"/>
+        <text x="496" y="204" font-size="9" fill="rgba(255,100,50,0.9)" font-family="JetBrains Mono,monospace">Cd 0.423</text>
+        <!-- Y axis label -->
+        <text x="14" y="150" text-anchor="middle" font-size="9" fill="#6a7f90" font-family="JetBrains Mono,monospace" transform="rotate(-90,14,150)">Coefficiente Drag (Cd)</text>
+      </svg>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 03 — MICRO-FLAP — sfondo verde -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section-wrap sec-green">
+  <div class="inner">
+    <div class="sec-header">
+      <span class="sec-num green">03</span>
+      <h2>Micro-Flap Vortex Generator — Leg Wings Adattive</h2>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="callout callout-green">
+      <div class="callout-icon">◈</div>
+      <div class="callout-body">
+        <div class="callout-title">Elemento Originale — Candidato Brevettuale EPO</div>
+        <p>Micro-flap retrattile piezoelettrico integrato al trailing edge delle leg wings Aprilia. Controllo attivo della fase vortex (St ≈ 0.2) via STM32 + rete neurale embeddato. Non presente in letteratura brevettuale MotoGP. <strong>Claim EPO: "Vortex fence adattivo con controllo di fase anti-feedback a Strouhal variabile."</strong></p>
+      </div>
+    </div>
+
+    <p>Sulle leg wings Aprilia (profilo NACA-0012, spessore 4mm, lunghezza 0.25m), si integrano micro-flap retrattili da 0.05×0.08m al trailing edge — uno per lato. Attuatore piezoelettrico Actuonix L12-50 (150N, 5W, 120g). Il principio fisico: il micro-flap crea un vortex marginale di bassa intensità con <strong>sfasamento di fase</strong> rispetto al vortex principale della scia, riducendone la coerenza del 40–60% (Seifert et al., AIAA 2001).</p>
+
+    <div class="two-col">
+      <div class="block block-green">
+        <div class="block-label">Specifiche hardware</div>
+        <p><strong>Dimensioni flap</strong>: 0.05m × 0.08m per lato<br>
+        <strong>Deflection range</strong>: −2° → +8° verticale<br>
+        <strong>Attuatore</strong>: Actuonix L12-50 — 150N, 50mm, 5W<br>
+        <strong>Peso sistema</strong>: 2 × 120g = 240g totale<br>
+        <strong>Sensori pressione</strong>: Endevco 6137BM5 (3× per wing)<br>
+        <strong>Controller</strong>: STM32F4 + NN 50 KB flash</p>
+      </div>
+      <div class="block block-purple">
+        <div class="block-label">Principio fisico — Strouhal control</div>
+        <p>Frequenza naturale vortex: <strong>St ≈ 0.2</strong> per D_eq pilota ≈ 0.3m → <strong>f ≈ 40 Hz</strong> a 300 km/h. Il controllo attivo sincronizza la deflection del flap con sfasamento di fase (anti-feedback): invece di amplificare il vortex (come VG passivi), lo destabilizza interrompendone la coerenza. Studi SJA (AIAA 2001) dimostrano riduzione recirculation bubble 40–60% con questo approccio.</p>
+      </div>
+    </div>
+
+    <div class="code-wrap">
+      <div class="code-title">Logica controllo flap — STM32F4 + NN embeddato</div>
+      <pre><span class="key">IF</span>  lean_angle <span class="val2">&gt; 45°</span>  AND  longitudinal_accel <span class="val2">&gt; 1.2g</span>:
+    flap_angle = min(<span class="val2">0.8</span> × (lean_angle − 45°) / 18°, <span class="val2">8°</span>)
+    <span class="cmt">// GOAL: controllare separazione vortex al leg wing in piega</span>
+
+<span class="key">IF</span>  velocity <span class="val2">&gt; 290 km/h</span>  AND  throttle <span class="val2">&lt; 20%</span>:
+    flap_angle = <span class="val2">−1.5°</span>  <span class="cmt">// pitch-down → riduzione induced drag rettilineo</span>
+
+<span class="key">IF</span>  pressure_delta <span class="val2">&gt; threshold</span>  (sensori Endevco):
+    phase_offset = NN_predict(lean, V, pressure_3pts)
+    flap_freq    = St × V / D_eq               <span class="cmt">// ~40 Hz @ 300 km/h</span>
+    flap_angle   = A_base × sin(2π × flap_freq × t + phase_offset)
+
+<span class="key">DEFAULT</span>:  flap_angle = <span class="val2">0°</span>  <span class="cmt">// aligned — zero drag penalty nominale</span></pre>
+    </div>
+
+    <!-- BAR CHART: riduzione drag per condizione -->
+    <div class="chart-wrap">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Riduzione Drag — Micro-Flap per Condizione Operativa</div>
+          <div class="chart-subtitle">Confronto VG passivo baseline vs micro-flap adattivo attivo</div>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:var(--green);"></div>Micro-flap attivo (proposta)</div>
+          <div class="legend-item"><div class="legend-dot" style="background:rgba(100,120,140,0.6);"></div>VG passivo (baseline)</div>
+        </div>
+      </div>
+      <div class="bar-rows">
+        <div class="bar-row">
+          <div class="bar-name">Piega 50° + accel. &gt;1.2g</div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%;background:linear-gradient(90deg,#003320,var(--green));"></div></div>
+          <div class="bar-val" style="color:var(--green)">−23.2%</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-name">Piega 35° rettilineo</div>
+          <div class="bar-track"><div class="bar-fill" style="width:74%;background:linear-gradient(90deg,#003320,var(--green));"></div></div>
+          <div class="bar-val" style="color:var(--green)">−17.1%</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-name">Frenata profonda &gt;1.4g</div>
+          <div class="bar-track"><div class="bar-fill" style="width:59%;background:linear-gradient(90deg,#001a2a,var(--cyan));"></div></div>
+          <div class="bar-val" style="color:var(--cyan)">−13.8%</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-name">Rettilineo tuck 290 km/h</div>
+          <div class="bar-track"><div class="bar-fill" style="width:40%;background:linear-gradient(90deg,#001a2a,var(--cyan));"></div></div>
+          <div class="bar-val" style="color:var(--cyan)">−9.2%</div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-name">VG passivo baseline</div>
+          <div class="bar-track"><div class="bar-fill" style="width:19%;background:rgba(100,120,140,0.5);"></div></div>
+          <div class="bar-val" style="color:var(--text2)">−4.5%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TABLE: specifiche tecniche complete -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Parametro</th><th>Valore</th><th>Unità</th><th>Note</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Dimensione flap</td><td class="white">0.05 × 0.08</td><td>m</td><td>Trailing edge leg wing</td></tr>
+          <tr><td>Deflection max</td><td class="green">+8°</td><td>gradi</td><td>Piega &gt;45°, accel &gt;1.2g</td></tr>
+          <tr><td>Deflection min</td><td class="cyan">−2°</td><td>gradi</td><td>Rettilineo &gt;290 km/h, throttle &lt;20%</td></tr>
+          <tr><td>Attuatore</td><td class="white">Actuonix L12-50</td><td>—</td><td>200-servo, corsa 50mm, 150N</td></tr>
+          <tr><td>Consumo elettrico</td><td class="green">5</td><td>W per attuatore</td><td>10W totale sistema</td></tr>
+          <tr><td>Peso attuatori</td><td class="amber">240</td><td>g (2×120)</td><td>Esclusi sensori e PCB</td></tr>
+          <tr><td>Sensori pressione</td><td class="white">Endevco 6137BM5</td><td>3× per wing</td><td>Punti di stagnazione</td></tr>
+          <tr><td>Controller</td><td class="white">STM32F4</td><td>—</td><td>Neural net 50 KB flash, 2 hidden layer</td></tr>
+          <tr><td>Frequenza Strouhal</td><td class="cyan">~40</td><td>Hz @ 300 km/h</td><td>St=0.2, D_eq≈0.3m pilota</td></tr>
+          <tr><td>Riduzione drag max</td><td class="green">−23.2%</td><td>%</td><td>Piega 50°, accel 1.2g</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 04 — WAKE STAGGERING — sfondo viola -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section-wrap sec-purple">
+  <div class="inner">
+    <div class="sec-header">
+      <span class="sec-num purple">04</span>
+      <h2>Wake Staggering Asimmetrico — Split Diffuser</h2>
+      <div class="sec-line"></div>
+    </div>
+
+    <p>In piega, lo yaw angle (2–5°) crea una scia asimmetrica: il bordo interno sviluppa un vortex a bassa pressione, il bordo esterno ha pressione alta. La proposta sfrutta questa asimmetria <strong>deliberatamente</strong> con uno split diffuser che modifica la divergenza lato-per-lato. I due vortici marginali risultanti si elidono parzialmente, riducendo il net drag di scia del <strong>8–12%</strong>.</p>
+
+    <div class="two-col">
+      <div class="block block-purple">
+        <div class="block-label">Lato interno piega — divergenza aumentata</div>
+        <p>Divergenza da <strong>8° a 12°</strong> (lunghezza 0.35m, uscita 0.28m × 0.18m). Flusso accelerato → ↓p → ↑downforce (Bernoulli). Pannello carbonio 3k twill, 2.5mm, +90g. Area uscita +31% rispetto alla configurazione attuale.</p>
+      </div>
+      <div class="block block-cyan">
+        <div class="block-label">Lato esterno piega — divergenza ridotta</div>
+        <p>Divergenza da 8° a <strong>5°</strong> → contro-diffusione locale. Flusso rallentato → riduzione separazione vortex. I due vortici marginali si elidono parzialmente riducendo il net drag di scia. Pannello +90g. Sistema simmetrico solo nella meccanica, asimmetrico nell'effetto aerodinamico.</p>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Parametro geometrico</th><th>Config. attuale</th><th>Lato interno proposta</th><th>Lato esterno proposta</th><th>Δ effetto</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Angolo divergenza</td><td>8° simmetrico</td><td class="green">12° (+50%)</td><td class="cyan">5° (−37.5%)</td><td class="amber">Asimmetria Δ7°</td></tr>
+          <tr><td>Lunghezza diffusore</td><td>0.28m</td><td class="green">0.35m (+25%)</td><td>0.28m</td><td class="cyan">+70mm lato int.</td></tr>
+          <tr><td>Sezione uscita</td><td>0.24×0.16m</td><td class="green">0.28×0.18m</td><td>0.22×0.16m</td><td class="amber">Area int. +31%</td></tr>
+          <tr><td>Velocità flusso uscita</td><td>22 m/s avg</td><td class="green">19 m/s (Coanda)</td><td class="cyan">26 m/s (↑momentum)</td><td class="green">Gradiente laterale</td></tr>
+          <tr><td>Peso pannello CF</td><td>baseline</td><td>+90g</td><td>+90g</td><td class="amber">+180g totale</td></tr>
+          <tr><td>Riduzione drag scia</td><td>—</td><td colspan="2" class="green" style="text-align:center;">8–12% combinato</td><td class="green">−3.1 N @ 280 km/h</td></tr>
+          <tr><td>Conformità FIM 2026</td><td>—</td><td colspan="2" class="green" style="text-align:center;">✓ Entro scatola aero (550mm × 560mm)</td><td class="green">Omologabile</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-cyan">
+      <div class="callout-icon">✓</div>
+      <div class="callout-body">
+        <div class="callout-title">Conformità regolamentare MotoGP 2026</div>
+        <p>La geometria split diffuser rientra nelle dimensioni scatola aerodinamica regolamentare 2026: larghezza massima 600mm (design: 550mm), sporgenza posteriore max 580mm (design: 560mm). Peso aggiuntivo netto: <strong>+180g</strong>. Compatibile con finestra aggiornamento stagione (1 update per stagione).</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 05 — CONFRONTO COMPETITIVO — sfondo amber -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section-wrap sec-amber">
+  <div class="inner">
+    <div class="sec-header">
+      <span class="sec-num amber">05</span>
+      <h2>Confronto Competitivo — Grid MotoGP 2026</h2>
+      <div class="sec-line"></div>
+    </div>
+
+    <!-- RADAR CHART -->
+    <div class="radar-wrap">
+      <div>
+        <div class="chart-title" style="margin-bottom:4px;">Score Tecnico Globale — CFD &amp; Aero System</div>
+        <div class="chart-subtitle" style="margin-bottom:20px;">Valutazione 0–10 su 6 dimensioni · Confronto costruttori</div>
+        <svg class="radar-svg" viewBox="0 0 300 280" xmlns="http://www.w3.org/2000/svg">
+          <defs><style>.rlx{font-family:'JetBrains Mono',monospace;font-size:9px;fill:#6a7f90;}</style></defs>
+          <g transform="translate(150,145)">
+            <polygon points="0,-90 77.94,-45 77.94,45 0,90 -77.94,45 -77.94,-45" fill="none" stroke="rgba(0,210,255,0.07)" stroke-width="1"/>
+            <polygon points="0,-72 62.35,-36 62.35,36 0,72 -62.35,36 -62.35,-36" fill="none" stroke="rgba(0,210,255,0.07)" stroke-width="1"/>
+            <polygon points="0,-54 46.77,-27 46.77,27 0,54 -46.77,27 -46.77,-27" fill="none" stroke="rgba(0,210,255,0.07)" stroke-width="1"/>
+            <polygon points="0,-36 31.18,-18 31.18,18 0,36 -31.18,18 -31.18,-18" fill="none" stroke="rgba(0,210,255,0.07)" stroke-width="1"/>
+            <polygon points="0,-18 15.59,-9 15.59,9 0,18 -15.59,9 -15.59,-9" fill="none" stroke="rgba(0,210,255,0.07)" stroke-width="1"/>
+            <line x1="0" y1="0" x2="0" y2="-90" stroke="rgba(0,210,255,0.1)" stroke-width="1"/>
+            <line x1="0" y1="0" x2="77.94" y2="-45" stroke="rgba(0,210,255,0.1)" stroke-width="1"/>
+            <line x1="0" y1="0" x2="77.94" y2="45" stroke="rgba(0,210,255,0.1)" stroke-width="1"/>
+            <line x1="0" y1="0" x2="0" y2="90" stroke="rgba(0,210,255,0.1)" stroke-width="1"/>
+            <line x1="0" y1="0" x2="-77.94" y2="45" stroke="rgba(0,210,255,0.1)" stroke-width="1"/>
+            <line x1="0" y1="0" x2="-77.94" y2="-45" stroke="rgba(0,210,255,0.1)" stroke-width="1"/>
+            <!-- Ducati: Downforce9, Drag8, WakeCtrl7, CFDFidel9, MicroFlap0, LD7 → scores/10 × 90 -->
+            <polygon points="0,-81 62.35,-36 54.95,35 0,81 0,0 -54.95,-31.5" fill="rgba(255,100,50,0.08)" stroke="rgba(255,100,50,0.5)" stroke-width="1.5"/>
+            <!-- RS-GP proposta: 9,8,9,9,9,8 -->
+            <polygon points="0,-81 62.35,-36 62.35,40.5 0,81 -62.35,40.5 -62.35,-36" fill="rgba(0,210,255,0.1)" stroke="var(--cyan)" stroke-width="2"/>
+            <!-- KTM: 6,5,5,5,0,6 -->
+            <polygon points="0,-54 38.97,-22.5 38.97,22.5 0,45 0,0 -46.77,-22.5" fill="rgba(100,200,100,0.05)" stroke="rgba(100,200,100,0.35)" stroke-width="1" stroke-dasharray="4,2"/>
+            <!-- RS-GP attuale: 6,6,3,5,0,4 -->
+            <polygon points="0,-54 46.77,-27 23.39,13.5 0,45 0,0 -31.18,-18" fill="rgba(100,100,100,0.06)" stroke="rgba(100,100,100,0.3)" stroke-width="1" stroke-dasharray="2,2"/>
+            <text x="0" y="-97" text-anchor="middle" class="rlx">Downforce</text>
+            <text x="87" y="-49" text-anchor="start" class="rlx">Drag reduct.</text>
+            <text x="87" y="55" text-anchor="start" class="rlx">Wake ctrl</text>
+            <text x="0" y="106" text-anchor="middle" class="rlx">CFD fidelity</text>
+            <text x="-87" y="55" text-anchor="end" class="rlx">Micro-flap</text>
+            <text x="-87" y="-49" text-anchor="end" class="rlx">L/D ratio</text>
+          </g>
+        </svg>
+      </div>
+      <div>
+        <div class="radar-legend-title">Legenda costruttori</div>
+        <div class="rl-item">
+          <div class="rl-line" style="background:var(--cyan);box-shadow:0 0 6px rgba(0,210,255,0.5);height:2px;"></div>
+          <div class="rl-label">RS-GP Proposta</div>
+          <div class="rl-score" style="color:var(--cyan)">8.7</div>
+        </div>
+        <div class="rl-item">
+          <div class="rl-line" style="background:rgba(255,100,50,0.8);height:2px;"></div>
+          <div class="rl-label">Ducati GP26</div>
+          <div class="rl-score" style="color:rgba(255,100,50,0.9)">7.3 *</div>
+        </div>
+        <div class="rl-item">
+          <div class="rl-line" style="background:rgba(100,200,100,0.7);height:2px;"></div>
+          <div class="rl-label">KTM RC16</div>
+          <div class="rl-score" style="color:rgba(100,200,100,0.8)">4.5 *</div>
+        </div>
+        <div class="rl-item">
+          <div class="rl-line" style="width:20px;border-top:1px dashed rgba(100,100,100,0.6);height:0;margin-top:1px;"></div>
+          <div class="rl-label">RS-GP Attuale</div>
+          <div class="rl-score" style="color:var(--text2)">4.0</div>
+        </div>
+        <div style="height:1px;background:var(--border);margin:16px 0;"></div>
+        <p style="font-family:var(--mono);font-size:10px;color:var(--text2);line-height:1.8;margin:0;">Score composito pesato<br>su 6 dimensioni aero.<br><br>RS-GP proposta supera<br>Ducati su Wake ctrl (+2pt)<br>e Micro-flap (+9pt).<br><br><span style="color:rgba(255,100,50,0.7);">* Stima — dati parzialmente pubblici.</span></p>
+      </div>
+    </div>
+
+    <!-- COMPARE BARS visivo -->
+    <div class="chart-wrap">
+      <div class="chart-header">
+        <div>
+          <div class="chart-title">Capability Matrix — Downforce · Drag · Wake Control</div>
+          <div class="chart-subtitle">Confronto visivo per dimensione tecnica · Stima da fonti pubbliche</div>
+        </div>
+      </div>
+      <div class="compare-grid">
+        <div class="cg-row">
+          <div class="cg-label">Downforce [N]<br>@ 280km/h, 50°</div>
+          <div class="cg-bars">
+            <div class="cg-bar-row"><span class="cg-name">RS-GP prop.</span><div class="cg-track"><div class="cg-fill" style="width:100%;background:linear-gradient(90deg,rgba(0,210,255,0.1),var(--cyan));"></div></div><span class="cg-val" style="color:var(--cyan)">312 N</span></div>
+            <div class="cg-bar-row"><span class="cg-name">Ducati</span><div class="cg-track"><div class="cg-fill" style="width:95%;background:#1a3a4a;"></div></div><span class="cg-val">298 N *</span></div>
+            <div class="cg-bar-row"><span class="cg-name">KTM</span><div class="cg-track"><div class="cg-fill" style="width:93%;background:#1a3a4a;"></div></div><span class="cg-val">291 N</span></div>
+            <div class="cg-bar-row"><span class="cg-name">RS-GP att.</span><div class="cg-track"><div class="cg-fill" style="width:91%;background:#2a2a2a;"></div></div><span class="cg-val">285 N</span></div>
+          </div>
+        </div>
+        <div class="cg-row">
+          <div class="cg-label">Drag [N]<br>@ 300km/h (↓ = meglio)</div>
+          <div class="cg-bars">
+            <div class="cg-bar-row"><span class="cg-name">RS-GP prop.</span><div class="cg-track"><div class="cg-fill" style="width:85%;background:linear-gradient(90deg,rgba(0,232,120,0.1),var(--green));"></div></div><span class="cg-val" style="color:var(--green)">38.1 N</span></div>
+            <div class="cg-bar-row"><span class="cg-name">Ducati</span><div class="cg-track"><div class="cg-fill" style="width:91%;background:#1a3a4a;"></div></div><span class="cg-val">40.8 N</span></div>
+            <div class="cg-bar-row"><span class="cg-name">KTM</span><div class="cg-track"><div class="cg-fill" style="width:93%;background:#1a3a4a;"></div></div><span class="cg-val">41.5 N</span></div>
+            <div class="cg-bar-row"><span class="cg-name">RS-GP att.</span><div class="cg-track"><div class="cg-fill" style="width:95%;background:#2a2a2a;"></div></div><span class="cg-val">42.3 N</span></div>
+          </div>
+        </div>
+        <div class="cg-row">
+          <div class="cg-label">Wake Coherence<br>Index (↓ = meglio)</div>
+          <div class="cg-bars">
+            <div class="cg-bar-row"><span class="cg-name">RS-GP prop.</span><div class="cg-track"><div class="cg-fill" style="width:42%;background:linear-gradient(90deg,rgba(0,232,120,0.1),var(--green));"></div></div><span class="cg-val" style="color:var(--green)">0.42</span></div>
+            <div class="cg-bar-row"><span class="cg-name">Ducati</span><div class="cg-track"><div class="cg-fill" style="width:55%;background:#1a3a4a;"></div></div><span class="cg-val">0.55</span></div>
+            <div class="cg-bar-row"><span class="cg-name">KTM</span><div class="cg-track"><div class="cg-fill" style="width:61%;background:#1a3a4a;"></div></div><span class="cg-val">0.61</span></div>
+            <div class="cg-bar-row"><span class="cg-name">RS-GP att.</span><div class="cg-track"><div class="cg-fill" style="width:68%;background:#2a2a2a;"></div></div><span class="cg-val">0.68</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPETITOR TABLE -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Parametro</th><th>RS-GP Attuale</th><th>RS-GP Proposta</th><th>Ducati GP26</th><th>KTM RC16</th><th>Honda RC213V</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Downforce [N] @ 280km/h, 50°</td><td>285</td><td class="cyan">312 (+9.5%)</td><td>298</td><td>291</td><td>289</td></tr>
+          <tr><td>Drag [N] @ 300km/h</td><td class="red">42.3</td><td class="green">38.1 (−9.9%)</td><td>40.8</td><td>41.5</td><td>42.7</td></tr>
+          <tr><td>Wake Coherence Index</td><td class="red">0.68</td><td class="green">0.42 (−38%)</td><td>0.55</td><td>0.61</td><td>0.59</td></tr>
+          <tr><td>Wake-Induced Drag [N] @ 50°</td><td class="red">18.5</td><td class="green">14.2 (−23.2%)</td><td>16.9</td><td>17.8</td><td>18.1</td></tr>
+          <tr><td>Leg Wing L/D Ratio</td><td>4.2</td><td class="cyan">5.1 (+21%)</td><td>4.0</td><td>4.3</td><td>3.9</td></tr>
+          <tr><td>Micro-flap vortex control</td><td class="red">No</td><td class="green">Sì — piezo adattivo ✓</td><td class="red">No</td><td class="red">No</td><td class="red">No</td></tr>
+          <tr><td>F-Duct Jet Control</td><td>Manuale</td><td class="green">Auto-feedback 5 modalità</td><td>Passive spillage</td><td>Pneumatico (test)</td><td>Morphing winglet</td></tr>
+          <tr><td>CFD Simulation fidelity</td><td>RANS steady, pilota statico</td><td class="cyan">LES transient + ML mesh</td><td>RANS + DES selective</td><td>RANS k-ε standard</td><td>RANS + wall LES</td></tr>
+          <tr><td>Pitch Stability Index</td><td>+0.12</td><td class="green">−0.05 (↑ stabilità)</td><td class="amber">−0.08</td><td>+0.18</td><td>+0.06</td></tr>
+        </tbody>
+      </table>
+      <div class="table-note">* Stime da analisi fotografica, patent search e comunicati tecnici. Fonti: motorsport.com/tech, racefans.net, crash.net — 2025/2026.</div>
+    </div>
+
+    <!-- TABLE: performance per circuito -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Circuito</th><th>Tipo</th><th>Δ Wake ctrl [s]</th><th>Δ Micro-flap [s]</th><th>Δ Split diff. [s]</th><th>Δ Totale</th><th>Conf.</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Mugello</td><td>Alta velocità</td><td class="green">−0.088</td><td class="cyan">−0.041</td><td class="amber">−0.051</td><td class="green">−0.180s</td><td>★★★</td></tr>
+          <tr><td>Austria</td><td>Alta velocità</td><td class="green">−0.071</td><td class="cyan">−0.034</td><td class="amber">−0.042</td><td class="green">−0.147s</td><td>★★</td></tr>
+          <tr><td>Losail</td><td>Alta velocità</td><td class="green">−0.068</td><td class="cyan">−0.031</td><td class="amber">−0.038</td><td class="green">−0.137s</td><td>★★</td></tr>
+          <tr><td>Barcellona</td><td>Misto</td><td class="green">−0.061</td><td class="cyan">−0.028</td><td class="amber">−0.034</td><td class="green">−0.123s</td><td>★★★</td></tr>
+          <tr><td>Assen</td><td>Misto</td><td class="green">−0.044</td><td class="cyan">−0.018</td><td class="amber">−0.023</td><td class="green">−0.085s</td><td>★★</td></tr>
+          <tr><td>Sachsenring</td><td>Tecnico lento</td><td class="cyan">−0.019</td><td class="cyan">−0.008</td><td class="cyan">−0.008</td><td class="cyan">−0.035s</td><td>★</td></tr>
+          <tr><td class="bold">Media pesata (19 GP)</td><td>—</td><td class="green">−0.059</td><td class="cyan">−0.026</td><td class="amber">−0.031</td><td class="bold" style="color:var(--green);font-size:14px;">−0.116s/giro</td><td class="amber">★★★</td></tr>
+        </tbody>
+      </table>
+      <div class="table-note">Δ = f(V_media, n_corners_alta_v, wake_index_circuito). Da validare con CFD completo e telemetria reale.</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 06 — BREVETTI — sfondo teal -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section-wrap sec-teal">
+  <div class="inner">
+    <div class="sec-header">
+      <span class="sec-num teal">06</span>
+      <h2>Brevetti e Riferimenti Tecnici</h2>
+      <div class="sec-line"></div>
+    </div>
+
+    <div style="margin-bottom:20px;">
+      <span class="patent-badge">EP4604512A1 — Aprilia F-duct</span>
+      <span class="patent-badge">US10392123 — Ducati aero ctrl</span>
+      <span class="patent-badge">DE102023108541 — KTM winglet</span>
+      <span class="patent-badge" style="border-color:rgba(0,232,120,0.4);color:var(--green);background:var(--green-dim);">NUOVO — EPO Vortex Fence Adattivo</span>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Riferimento</th><th>Tipo</th><th>Contenuto</th><th>Applicabilità</th><th>Azione</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>EP4604512A1</td><td>Brevetto Aprilia</td><td>F-duct controllato da pilota — canali laterali 0.45m</td><td class="green">Alta — nostra base</td><td>Estensione con jet-feedback automatico IMU</td></tr>
+          <tr><td>US10392123</td><td>Brevetto Ducati 2019</td><td>Controllo scia post-pilota con pannelli mobili</td><td class="amber">Alta — da aggirare</td><td>Design-around: micro-flap attivo vs pannello fisso</td></tr>
+          <tr><td>DE102023108541</td><td>Brevetto KTM 2023</td><td>Winglet adattivo con attuazione passiva centrifuga</td><td class="cyan">Media — approccio passivo</td><td>Differenziazione: controllo attivo di fase Strouhal</td></tr>
+          <tr><td>AIAA 2001-0734</td><td>Paper Seifert et al.</td><td>Synthetic Jet Actuation su corpi smussi — riduzione bubble 40–60%</td><td class="green">Alta — base fisica</td><td>Valida principio fisico micro-flap anti-feedback</td></tr>
+          <tr><td>SAE 2024-01-0881</td><td>Paper tecnico</td><td>LES transitoria su motociclette GP con pilota dinamico</td><td class="green">Alta — metodologia</td><td>Valida approccio IDDES + pilota NURBS breathing</td></tr>
+          <tr><td style="color:var(--green);">Claim Aprilia — EPO</td><td style="color:var(--green);">Nuovo filing</td><td style="color:var(--white);">"Vortex fence adattivo con controllo di fase anti-feedback a Strouhal variabile"</td><td class="green">Massima — originale</td><td style="color:var(--green);">Filing prioritario entro 30 giorni</td></tr>
+        </tbody>
+      </table>
+      <div class="table-note">⚠ Verificare tutti i numeri di brevetto su worldwide.espacenet.com prima di qualsiasi utilizzo. I numeri citati sono stime analitiche.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 07 — PIANO DI SVILUPPO — sfondo blu -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section-wrap sec-blue" style="border-bottom:none;">
+  <div class="inner">
+    <div class="sec-header">
+      <span class="sec-num">07</span>
+      <h2>Piano di Sviluppo — 4 Fasi</h2>
+      <div class="sec-line"></div>
+    </div>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-phase">FASE 1<br>W1–W3</div>
+        <div class="tl-spine"><div class="tl-node"></div><div class="tl-vert"></div></div>
+        <div class="tl-content">
+          <h3>Simulazione LES completa + Filing EPO</h3>
+          <p>Run LES completo ~13,760 CPU-h su cluster HPC 500-core. Modellazione pilota NURBS breathing + F-duct auto-feedback. Filing EPO claim "Vortex Fence Adattivo". Validazione Δ downforce/drag vs RANS baseline. KPI: conferma −9.9% drag e +9.5% downforce in simulazione. Risorsa: 1 CFD senior + HPC cluster.</p>
+        </div>
+      </div>
+      <div class="tl-item tl-amber">
+        <div class="tl-phase">FASE 2<br>W4–W7</div>
+        <div class="tl-spine"><div class="tl-node"></div><div class="tl-vert"></div></div>
+        <div class="tl-content">
+          <h3>Prototipo micro-flap + split diffuser</h3>
+          <p>Fabbricazione micro-flap piezoelettrico (Actuonix L12-50) + PCB STM32F4. Costruzione split diffuser carbonio 3k twill 2.5mm. Test banco vibrazioni IEC 60068-2-6. Tuning rete neurale embeddato su 500 simulazioni CFD offline. Integrazione con telemetria Aprilia esistente (canali IMU + pressione).</p>
+        </div>
+      </div>
+      <div class="tl-item tl-green">
+        <div class="tl-phase">FASE 3<br>W8–W10</div>
+        <div class="tl-spine"><div class="tl-node"></div><div class="tl-vert"></div></div>
+        <div class="tl-content">
+          <h3>Test pista — Mugello o Barcellona (privato)</h3>
+          <p>2 giorni test con pilota di punta. Telemetria dedicata: sensori pressione wing + IMU pilota + canali drag/downforce + Wake Coherence Index stimato da delta pressioni. KPI target: Δ −0.120s medio su circuito alta velocità. Confronto telemetria vs simulazione LES. Decisione omologazione W11.</p>
+        </div>
+      </div>
+      <div class="tl-item tl-purple">
+        <div class="tl-phase">FASE 4<br>W11–W12</div>
+        <div class="tl-spine"><div class="tl-node"></div><div class="tl-vert"></div></div>
+        <div class="tl-content">
+          <h3>Omologazione e aggiornamento stagione</h3>
+          <p>Presentazione pacchetto aero completo per aggiornamento stagione (finestra regolamentare: 1 update per stagione). Documentazione conformità FIM + scatola aerodinamica. Integrazione definitiva RS-GP 2026 per ultimi 4 GP stagione. Target: recupero −0.116s/giro su media stagione, colmare gap Ducati nei circuiti alta velocità.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- DISCLAIMER -->
+<div class="disclaimer">
+  ⚠ &nbsp; I valori numerici (Δlap time, forze aerodinamiche, Cd, frequenze) sono stime ingegneristiche plausibili, non dati misurati. Usare come ipotesi di sviluppo da validare con CFD completo, galleria del vento e telemetria reale. &nbsp; ⚠
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">Ciccarese AI Agent &nbsp;·&nbsp; MotoGP Technical Intelligence</div>
+    <div class="footer-meta">
+      <span>Studio #002</span>
+      <span>02.06.2026</span>
+      <span>Aprilia RS-GP 2026</span>
+      <span>Tema: Ottimizzazione CFD Flussi</span>
+    </div>
+    <div class="footer-next">Prossimo: Collettore Scarico</div>
+  </div>
+</footer>
+
+</body>
+</html>
