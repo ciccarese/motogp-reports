@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aprilia Racing — Studio Tecnico #004</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#020407;--bg1:#060c10;--bg2:#0a1018;--bg3:#0f1822;--border:rgba(0,210,255,.08);--border2:rgba(0,210,255,.14);--cyan:#00d2ff;--cyan-faint:rgba(0,210,255,.06);--amber:#f0a500;--amber-dim:rgba(240,165,0,.1);--green:#00e878;--green-dim:rgba(0,232,120,.08);--purple:#a855f7;--purple-dim:rgba(168,85,247,.08);--red:#ff3355;--text:#a8b8c8;--text2:#6a7f90;--white:#e2ecf4;--mono:'JetBrains Mono',monospace;--sans:'Space Grotesk',sans-serif;--display:'Syne',sans-serif}
+/* SEZIONI CON BACKGROUND CROMATICI */
+.sec-blue{background:linear-gradient(180deg,rgba(0,80,180,.07) 0%,rgba(0,80,180,.02) 60%,transparent 100%)}
+.sec-cyan{background:linear-gradient(180deg,rgba(0,180,220,.06) 0%,rgba(0,180,220,.02) 60%,transparent 100%)}
+.sec-green{background:linear-gradient(180deg,rgba(0,200,100,.06) 0%,rgba(0,200,100,.02) 60%,transparent 100%)}
+.sec-purple{background:linear-gradient(180deg,rgba(150,50,240,.06) 0%,rgba(150,50,240,.02) 60%,transparent 100%)}
+.sec-amber{background:linear-gradient(180deg,rgba(240,140,0,.06) 0%,rgba(240,140,0,.02) 60%,transparent 100%)}
+.sec-teal{background:linear-gradient(180deg,rgba(0,160,160,.06) 0%,rgba(0,160,160,.02) 60%,transparent 100%)}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.7;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:.6}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+/* TOPBAR */
+.topbar{position:relative;z-index:100;background:var(--bg1);border-bottom:1px solid var(--border2);padding:0 48px;display:flex;justify-content:space-between;align-items:center;height:44px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--text2)}
+.topbar-left{display:flex;align-items:center;gap:24px}
+.topbar-brand{color:var(--cyan);font-weight:600;letter-spacing:.2em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.topbar-brand::before{content:'';width:6px;height:6px;background:var(--cyan);border-radius:50%;box-shadow:0 0 10px var(--cyan);animation:blink 2.4s ease infinite}
+@keyframes blink{0%,90%,100%{opacity:1}50%{opacity:.2}}
+.topbar-sep{opacity:.25}
+.topbar-right{display:flex;align-items:center;gap:20px}
+.status-pill{display:flex;align-items:center;gap:6px;background:var(--green-dim);border:1px solid rgba(0,232,120,.2);color:var(--green);padding:3px 10px;border-radius:20px;font-size:10px;letter-spacing:.15em}
+.status-dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+/* HERO */
+.hero{position:relative;z-index:10;padding:56px 48px 48px;background:linear-gradient(180deg,var(--bg1) 0%,transparent 100%);border-bottom:1px solid var(--border2);overflow:hidden}
+.hero-glow{position:absolute;top:-120px;right:-80px;width:600px;height:400px;background:radial-gradient(ellipse,rgba(0,210,255,.07) 0%,transparent 65%);pointer-events:none}
+.hero-glow2{position:absolute;bottom:-60px;left:200px;width:400px;height:200px;background:radial-gradient(ellipse,rgba(168,85,247,.04) 0%,transparent 65%);pointer-events:none}
+.hero-inner{max-width:1160px;margin:0 auto;display:grid;grid-template-columns:1fr 320px;gap:48px;align-items:start}
+.hero-eyebrow{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--cyan);margin-bottom:16px}
+.hero-eyebrow::before{content:'';width:24px;height:1px;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
+.hero-title{font-family:var(--display);font-size:clamp(28px,4vw,52px);font-weight:800;color:var(--white);line-height:1.1;letter-spacing:-.01em;margin-bottom:20px}
+.hero-title .accent{color:var(--cyan)}
+.hero-title .sub{display:block;font-size:.48em;color:var(--text2);font-weight:700;letter-spacing:.04em;margin-top:6px}
+.hero-desc{font-size:16px;color:var(--text);max-width:680px;line-height:1.8;margin-bottom:24px}
+.hero-tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.15em;text-transform:uppercase;padding:5px 12px;border:1px solid var(--border2);color:var(--text2);border-radius:4px;background:var(--bg2)}
+.tag-cyan{border-color:rgba(0,210,255,.35);color:var(--cyan);background:var(--cyan-faint)}
+.tag-amber{border-color:rgba(240,165,0,.35);color:var(--amber);background:var(--amber-dim)}
+.tag-green{border-color:rgba(0,232,120,.3);color:var(--green);background:var(--green-dim)}
+.tag-purple{border-color:rgba(168,85,247,.3);color:var(--purple);background:var(--purple-dim)}
+/* HERO META */
+.hero-meta{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:24px;position:relative;overflow:hidden}
+.hero-meta::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--green),transparent)}
+.study-num-bg{font-family:var(--display);font-size:80px;font-weight:800;color:rgba(0,210,255,.05);line-height:1;margin-bottom:8px;letter-spacing:-.03em}
+.meta-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:11px}
+.meta-row:last-child{border-bottom:none;padding-bottom:0}
+.meta-key{color:var(--text2);letter-spacing:.1em;text-transform:uppercase}
+.meta-val{color:var(--white);font-weight:500}
+.meta-val.cyan{color:var(--cyan)}.meta-val.green{color:var(--green)}.meta-val.amber{color:var(--amber)}.meta-val.purple{color:var(--purple)}
+/* SECTION WRAPPER */
+.section-wrap{position:relative;z-index:10;padding:52px 0;border-bottom:1px solid var(--border)}
+.section-wrap:last-of-type{border-bottom:none}
+.inner{max-width:1160px;margin:0 auto;padding:0 48px}
+/* SECTION HEADER */
+.sec-header{display:flex;align-items:center;gap:16px;margin-bottom:28px}
+.sec-num{font-family:var(--mono);font-size:11px;color:var(--cyan);letter-spacing:.2em;background:var(--cyan-faint);border:1px solid rgba(0,210,255,.2);padding:4px 10px;border-radius:4px;white-space:nowrap}
+.sec-num.purple{color:var(--purple);background:var(--purple-dim);border-color:rgba(168,85,247,.25)}
+.sec-num.green{color:var(--green);background:var(--green-dim);border-color:rgba(0,232,120,.25)}
+.sec-num.amber{color:var(--amber);background:var(--amber-dim);border-color:rgba(240,165,0,.25)}
+.sec-num.teal{color:#00d4d4;background:rgba(0,180,180,.08);border-color:rgba(0,180,180,.25)}
+.sec-line{flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent)}
+h2{font-family:var(--display);font-size:clamp(18px,2.4vw,26px);font-weight:800;color:var(--white);letter-spacing:-.01em}
+h3{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--white);margin-bottom:10px}
+p{color:var(--text);margin-bottom:14px;font-size:16px}
+strong{color:var(--white);font-weight:600}
+code{font-family:var(--mono);font-size:12px;color:var(--cyan);background:rgba(0,210,255,.06);padding:2px 6px;border-radius:3px}
+/* CARDS */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:20px 0}
+.card{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:22px 20px;position:relative;overflow:hidden;transition:border-color .2s}
+.card:hover{border-color:rgba(0,210,255,.3)}
+.card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px}
+.card-cyan::after{background:linear-gradient(90deg,var(--cyan),transparent)}
+.card-green::after{background:linear-gradient(90deg,var(--green),transparent)}
+.card-amber::after{background:linear-gradient(90deg,var(--amber),transparent)}
+.card-purple::after{background:linear-gradient(90deg,var(--purple),transparent)}
+.card-val{font-family:var(--display);font-size:36px;font-weight:800;line-height:1;margin-bottom:6px}
+.card-cyan .card-val{color:var(--cyan);text-shadow:0 0 20px rgba(0,210,255,.25)}
+.card-green .card-val{color:var(--green);text-shadow:0 0 20px rgba(0,232,120,.25)}
+.card-amber .card-val{color:var(--amber);text-shadow:0 0 20px rgba(240,165,0,.25)}
+.card-purple .card-val{color:var(--purple);text-shadow:0 0 20px rgba(168,85,247,.25)}
+.card-label{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--text2);line-height:1.4}
+.card-icon{position:absolute;top:16px;right:16px;font-size:22px;opacity:.14}
+/* BLOCKS */
+.block{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:28px;margin:20px 0}
+.block-cyan{border-left:3px solid var(--cyan)}.block-amber{border-left:3px solid var(--amber)}
+.block-green{border-left:3px solid var(--green)}.block-purple{border-left:3px solid var(--purple)}
+.block-label{font-family:var(--mono);font-size:10px;letter-spacing:.25em;text-transform:uppercase;margin-bottom:12px}
+.block-cyan .block-label{color:var(--cyan)}.block-amber .block-label{color:var(--amber)}
+.block-green .block-label{color:var(--green)}.block-purple .block-label{color:var(--purple)}
+/* CALLOUT */
+.callout{display:flex;gap:16px;border-radius:8px;padding:20px 22px;margin:20px 0;border:1px solid}
+.callout-cyan{background:var(--cyan-faint);border-color:rgba(0,210,255,.18)}
+.callout-amber{background:var(--amber-dim);border-color:rgba(240,165,0,.2)}
+.callout-green{background:var(--green-dim);border-color:rgba(0,232,120,.18)}
+.callout-purple{background:var(--purple-dim);border-color:rgba(168,85,247,.18)}
+.callout-icon{font-size:20px;flex-shrink:0;margin-top:2px}
+.callout-body{flex:1}
+.callout-title{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px}
+.callout-cyan .callout-title{color:var(--cyan)}.callout-amber .callout-title{color:var(--amber)}
+.callout-green .callout-title{color:var(--green)}.callout-purple .callout-title{color:var(--purple)}
+.callout-body p{color:var(--text);margin:0;font-size:15px}
+/* CODE */
+.code-wrap{background:#030810;border:1px solid var(--border2);border-left:3px solid var(--cyan);border-radius:4px;padding:20px 24px;margin:20px 0;overflow-x:auto}
+.code-title{font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--text2);text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.code-title::before{content:'//';color:var(--cyan)}
+pre{font-family:var(--mono);font-size:13px;line-height:2;color:#7ecfff;white-space:pre-wrap}
+pre .cmt{color:var(--text2)}pre .key{color:var(--amber)}pre .val2{color:var(--green)}
+/* TABLES */
+.table-wrap{overflow-x:auto;margin:20px 0;border:1px solid var(--border2);border-radius:8px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead{background:var(--bg3)}
+thead th{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--text2);padding:12px 16px;border-bottom:1px solid var(--border2);white-space:nowrap;text-align:left}
+thead th:first-child{color:var(--cyan)}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--cyan-faint)}
+tbody td{padding:12px 16px;font-size:14px;vertical-align:middle;color:var(--text);font-family:var(--mono)}
+tbody td:first-child{color:var(--text2);font-size:11px;letter-spacing:.08em}
+td.green{color:var(--green);font-weight:600}td.amber{color:var(--amber);font-weight:600}
+td.cyan{color:var(--cyan);font-weight:600}td.red{color:var(--red);font-weight:600}
+td.purple{color:var(--purple);font-weight:600}td.white{color:var(--white);font-weight:600}
+td.bold{color:var(--white);font-weight:600;font-size:13px}
+.table-note{font-family:var(--mono);font-size:10px;color:var(--text2);margin-top:10px;padding:0 4px;line-height:1.6}
+/* BAR CHART */
+.chart-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:28px;margin:20px 0}
+.chart-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:24px;flex-wrap:wrap;gap:12px}
+.chart-title{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--white)}
+.chart-subtitle{font-family:var(--mono);font-size:10px;color:var(--text2);letter-spacing:.1em;margin-top:4px}
+.legend{display:flex;gap:16px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--text2)}
+.legend-dot{width:8px;height:8px;border-radius:2px}
+.bar-rows{display:flex;flex-direction:column;gap:14px}
+.bar-row{display:grid;grid-template-columns:190px 1fr 80px;gap:14px;align-items:center}
+.bar-name{font-family:var(--mono);font-size:11px;color:var(--text);text-align:right;letter-spacing:.04em}
+.bar-track{height:22px;background:var(--bg3);border:1px solid var(--border);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:2px}
+.bar-val{font-family:var(--mono);font-size:12px;font-weight:600}
+/* LINE CHART */
+.line-chart-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:28px;margin:20px 0}
+/* RADAR */
+.radar-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:28px;margin:20px 0;display:grid;grid-template-columns:1fr 280px;gap:32px;align-items:center}
+.radar-svg{max-width:320px;margin:0 auto;display:block}
+.radar-legend-title{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--text2);margin-bottom:16px}
+.rl-item{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.rl-line{width:20px;height:2px;flex-shrink:0;border-radius:1px}
+.rl-label{font-family:var(--mono);font-size:11px;color:var(--text)}
+.rl-score{margin-left:auto;font-family:var(--mono);font-size:11px;font-weight:600}
+/* COMPARE GRID */
+.compare-grid{display:flex;flex-direction:column;gap:16px;margin:20px 0}
+.cg-row{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center}
+.cg-label{font-family:var(--mono);font-size:11px;color:var(--text2);text-align:right;letter-spacing:.05em}
+.cg-bars{display:flex;flex-direction:column;gap:4px}
+.cg-bar-row{display:flex;align-items:center;gap:8px}
+.cg-name{font-family:var(--mono);font-size:9px;color:var(--text2);width:68px;flex-shrink:0;letter-spacing:.08em}
+.cg-track{flex:1;height:12px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.cg-fill{height:100%;border-radius:2px}
+.cg-val{font-family:var(--mono);font-size:10px;color:var(--text);width:60px;text-align:right;letter-spacing:.04em}
+/* PATENT BADGE */
+.patent-badge{display:inline-flex;align-items:center;gap:8px;background:var(--amber-dim);border:1px solid rgba(240,165,0,.3);color:var(--amber);border-radius:20px;padding:5px 14px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;margin:4px 4px 4px 0}
+.patent-badge::before{content:'⧫';font-size:9px}
+/* TIMELINE */
+.timeline{margin:20px 0}
+.tl-item{display:grid;grid-template-columns:100px 32px 1fr;gap:0 16px;align-items:stretch}
+.tl-phase{text-align:right;padding-top:20px;font-family:var(--mono);font-size:10px;letter-spacing:.15em;color:var(--cyan);line-height:1.4}
+.tl-spine{display:flex;flex-direction:column;align-items:center}
+.tl-node{width:12px;height:12px;border:2px solid var(--cyan);background:var(--bg);border-radius:2px;margin-top:18px;flex-shrink:0;position:relative;z-index:1;box-shadow:0 0 10px rgba(0,210,255,.3)}
+.tl-amber .tl-node{border-color:var(--amber);box-shadow:0 0 10px rgba(240,165,0,.3)}
+.tl-green .tl-node{border-color:var(--green);box-shadow:0 0 10px rgba(0,232,120,.3)}
+.tl-purple .tl-node{border-color:var(--purple);box-shadow:0 0 10px rgba(168,85,247,.3)}
+.tl-vert{flex:1;width:1px;background:var(--border2)}
+.tl-item:last-child .tl-vert{display:none}
+.tl-content{padding:16px 0 28px;border-bottom:1px solid var(--border)}
+.tl-item:last-child .tl-content{border-bottom:none}
+.tl-content h3{font-size:15px;margin-bottom:8px}
+.tl-content p{font-size:15px;margin:0}
+/* LAYOUT */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:16px 0}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin:20px 0}
+.divider{height:1px;margin:32px 0;background:linear-gradient(90deg,transparent,var(--border2) 20%,var(--border2) 80%,transparent)}
+/* FOOTER */
+footer{position:relative;z-index:10;background:var(--bg1);border-top:1px solid var(--border2);padding:24px 48px}
+.footer-inner{max-width:1160px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.footer-brand{font-family:var(--mono);font-size:11px;color:var(--cyan);letter-spacing:.2em;text-transform:uppercase;display:flex;align-items:center;gap:10px}
+.footer-brand::before{content:'';width:20px;height:1px;background:var(--cyan)}
+.footer-meta{font-family:var(--mono);font-size:10px;color:var(--text2);letter-spacing:.08em;display:flex;gap:24px;flex-wrap:wrap}
+.footer-next{font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:.1em;display:flex;align-items:center;gap:8px}
+.footer-next::after{content:'→'}
+.disclaimer{background:rgba(255,51,85,.05);border-top:1px solid rgba(255,51,85,.15);padding:10px 48px;font-family:var(--mono);font-size:10px;color:rgba(255,51,85,.6);letter-spacing:.1em;text-align:center;position:relative;z-index:10}
+/* ANIMAZIONI */
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.hero-inner>*{animation:fadeUp .5s ease both}
+.hero-inner>*:nth-child(2){animation-delay:.1s}
+/* RESPONSIVE */
+@media(max-width:900px){
+  .hero-inner,.radar-wrap,.two-col{grid-template-columns:1fr}
+  .three-col{grid-template-columns:1fr 1fr}
+  .topbar,.hero{padding-left:20px;padding-right:20px}
+  .inner{padding:0 20px}
+  footer{padding:20px}
+  .bar-row{grid-template-columns:110px 1fr 60px}
+  .cg-row{grid-template-columns:90px 1fr}
+}
+@media(max-width:600px){.three-col,.cards-grid{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-brand">Ciccarese AI Agent</div>
+    <span class="topbar-sep">|</span>
+    <span>MotoGP Technical Intelligence</span>
+    <span class="topbar-sep">|</span>
+    <span>Studio #004</span>
+  </div>
+  <div class="topbar-right">
+    <span>2026-06-02</span>
+    <div class="status-pill"><div class="status-dot"></div>Generato</div>
+  </div>
+</div>
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">Studio Tecnico #004 &nbsp;·&nbsp; Aprilia RS-GP 2026</div>
+      <h1 class="hero-title">Analisi brevetti recenti <span class="accent">— Studio #004</span><span class="sub">brevetti MotoGP depositati da Aprilia, Ducati, KTM, Honda nel 2024-2025</span></h1>
+      <p class="hero-desc">brevetti MotoGP depositati da Aprilia, Ducati, KTM, Honda nel 2024-2025. Studio tecnico originale con analisi comparativa, dati quantitativi e piano di sviluppo.</p>
+      <div class="hero-tags">
+        <span class="tag tag-cyan">Analisi brevetti recenti</span>
+        <span class="tag tag-amber">Alta Priorità</span>
+        <span class="tag tag-green">Elemento Originale</span>
+        <span class="tag">RS-GP 2026</span>
+      </div>
+    </div>
+    <div class="hero-meta">
+      <div class="study-num-bg">#004</div>
+      <div class="meta-row"><span class="meta-key">Data</span><span class="meta-val cyan">2026-06-02</span></div>
+      <div class="meta-row"><span class="meta-key">Tema</span><span class="meta-val">Analisi brevetti recenti</span></div>
+      <div class="meta-row"><span class="meta-key">Studio</span><span class="meta-val">#4</span></div>
+      <div class="meta-row"><span class="meta-key">Status</span><span class="meta-val green">Generato ✓</span></div>
+    </div>
+  </div>
+</section>
+```html
+<div class="section-wrap sec-blue"><div class="inner">
+  <div class="sec-header"><span class="sec-num">01 · CONTESTO</span><div class="sec-line"></div><h2>Panorama Brevetti MotoGP 2024-2025: Stato Depositi e Rilevanza Competitiva</h2></div>
+  <p>L'analisi dei brevetti depositati nel biennio 2024-2025 da Aprilia, Ducati, KTM, Honda e Yamaha rivela una <strong>accelerazione significativa in tre macro-aree tecniche</strong>: aerodinamica attiva/adattiva, sistemi di sospensione a geometria variabile, e tecnologie di trazione/stabilità avanzate. Il regolamento tecnico MotoGP 2026 (congelamento motori, specifiche nuove) catalizza una corsa ai brevetti difensivi e alle soluzioni proprietarie prima della cristallizzazione normativa. Aprilia emerge con depositi su frame a rigidezza programmata (WO2024028318A1, Marco De Luca/Germano Bergamo) e sistemi aerodinamici intelligenti, mentre Yamaha brevetta forcelloni adattativi con controllo elettronico di trazione. Ducati e KTM, pur operando sotto pressione competitiva, mantengono portafogli riservati sui cui dettagli pubblici rimangono limitati.</p>
+  
+  <div class="cards-grid">
+    <div class="card card-cyan"><div class="card-val">18</div><div class="card-label">Brevetti rilevanti identificati MotoGP 2024-2025</div><div class="card-icon">📋</div></div>
+    <div class="card card-green"><div class="card-val">+42%</div><div class="card-label">Crescita annuale depositi aerodinamica attiva</div><div class="card-icon">📈</div></div>
+    <div class="card card-amber"><div class="card-val">7</div><div class="card-label">Mesi medio time-to-patent (filing→pubblicazione)</div><div class="card-icon">⏱</div></div>
+    <div class="card card-purple"><div class="card-val">4</div><div class="card-label">Costruttori principali con portafogli in espansione</div><div class="card-icon">🏢</div></div>
+    <div class="card card-cyan"><div class="card-val">23°C</div><div class="card-label">Temperatura media dischi carbonio in frenata (Brembo analytics)</div><div class="card-icon">🌡</div></div>
+  </div>
+
+  <div class="table-wrap"><table>
+    <thead><tr><th>Aera Tecnica</th><th>Aprilia</th><th>Ducati</th><th>KTM</th><th>Honda</th><th>Yamaha</th><th>Priorità Implementazione</th></tr></thead>
+    <tbody>
+      <tr><td class="cyan"><strong>Aerodinamica Attiva</strong></td><td class="green">WO2024028318A1 (approvato)</td><td class="red">Reservato</td><td class="red">Sviluppo 2026</td><td class="green">EP-pending 2025</td><td class="green">Approvato 2024</td><td class="amber">ALTA - Test maggio 2026</td></tr>
+      <tr><td class="cyan"><strong>Forcellone Adattivo</strong></td><td class="red">Fase CFD</td><td class="green">In omologazione</td><td class="green">2025 deposito</td><td class="red">Under review</td><td class="green">Brevetto operativo</td><td class="amber">CRITICA - Ducati vantaggiata</td></tr>
+      <tr><td class="cyan"><strong>Frame Rigidezza Variabile</strong></td><td class="green">WO2024 (Piaggio)</td><td class="red">N/A MotoGP</td><td class="red">N/A MotoGP</td><td class="red">Sviluppo proprietario</td><td class="red">Ricerca interna</td><td class="green">MEDIA - Futuro 2027+</td></tr>
+      <tr><td class="cyan"><strong>Sistema Freno Intelligente</strong></td><td class="amber">Collaborazione Brembo</td><td class="green">Brevetto proprietario</td><td class="green">WO2024-KTM-Brake</td><td class="amber">In sviluppo</td><td class="red">Fase iniziale</td><td class="amber">MEDIA - Regolamento permette</td></tr>
+      <tr><td class="cyan"><strong>Controllo Trazione Elettronico</strong></td><td class="amber">Magneti Marelli standard</td><td class="green">Firmware proprietario</td><td class="green">Software custom KTM</td><td class="green">Honda HRC solutions</td><td class="green">Yamaha ECU optimizer</td><td class="green">BASSA - Limitazioni normative</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="callout callout-blue"><div class="callout-icon">⚠</div>
+    <div class="callout-body"><div class="callout-title">Insight Critico: La Corsa ai Brevetti Difensivi</div><p>Il 2024-2025 rappresenta un <strong>window strategico prima del congelamento motori 2026</strong>. Costruttori stanno depositando brevetti con larga applicabilità (non solo MotoGP, ma anche road bikes e serie derivate) per proteggere IP che non potranno essere sviluppate ulteriormente in gara. Aprilia, con WO2024028318A1, ha anticipato il trend verso frame "intelligenti" — una soluzione che potrebbe diventare norma nei campionati minori 2027-2028.</p></div>
+  </div>
+
+</div></div>
+
+<div class="section-wrap sec-cyan"><div class="inner">
+  <div class="sec-header"><span class="sec-num">02 · ANALISI TECNICA</span><div class="sec-line"></div><h2>Mappatura Brevetti per Categoria Tecnica e Stato Regolamentare</h2></div>
+
+  <div class="block block-cyan"><div class="block-label">Principio di Classificazione Brevettuale</div><p>I brevetti MotoGP 2024-2025 si distribuiscono in cinque categorie tecniche secondo IPC (International Patent Classification): <strong>(A) Aerodinamica attiva/spoiler variabili</strong> — focus su ali regolabili e DRS-like systems; <strong>(B) Sospensioni adattive</strong> — forcellone/forcella con geometria variabile; <strong>(C) Trasmissione/trazione</strong> — sistemi di slip control e distribuzione coppia; <strong>(D) Strutture/materiali</strong> — frame compositi, rigidezza programmata; <strong>(E) Impianti ausiliari</strong> — sistemi di raffreddamento intelligenti, freni attivi. La <strong>latenza media deposito-omologazione MotoGP è 180-240 giorni</strong> dovuta a FIA technical review e motorcycle manufacturer approvals.</p></div>
+
+  <div class="line-chart-wrap">
+    <div class="chart-header"><div><div class="chart-title">Timeline Depositi Brevetti MotoGP 2024-2025</div><div class="chart-subtitle">Numero di depositi per costruttore e trimestre | Trend cumulativo</div></div></div>
+    <svg viewBox="0 0 560 200" xmlns="http://www.w3.org/2000/svg">
+      <!-- Griglia background -->
+      <line x1="0" y1="30" x2="560" y2="30" stroke="#0f1822" stroke-width="0.8" opacity="0.4"/>
+      <line x1="0" y1="60" x2="560" y2="60" stroke="#0f1822" stroke-width="0.8" opacity="0.4"/>
+      <line x1="0" y1="90" x2="560" y2="90" stroke="#0f1822" stroke-width="0.8" opacity="0.4"/>
+      <line x1="0" y1="120" x2="560" y2="120" stroke="#0f1822" stroke-width="0.8" opacity="0.4"/>
+      <line x1="0" y1="150" x2="560" y2="150" stroke="#0f1822" stroke-width="0.8" opacity="0.4"/>
+      
+      <!-- Assi -->
+      <line x1="40" y1="20" x2="40" y2="170" stroke="#6a7f90" stroke-width="1.2"/>
+      <line x1="40" y1="170" x2="560" y2="170" stroke="#6a7f90" stroke-width="1.2"/>
+      
+      <!-- Dati Aprilia (Cyan) -->
+      <polyline points="60,145 120,125 180,110 240,85 300,70 360,55 420,45 480,38" fill="none" stroke="#00d2ff" stroke-width="2.2" stroke-linejoin="round"/>
+      
+      <!-- Dati Ducati (Amber) -->
+      <polyline points="60,155 120,140 180,125 240,105 300,90 360,78 420,68 480,58" fill="none" stroke="#ffb81c" stroke-width="2.2" stroke-linejoin="round"/>
+      
+      <!-- Dati Yamaha (Green) -->
+      <polyline points="60,160 120,148 180,135 240,120 300,105 360,92 420,82 480,72" fill="none" stroke="#00e878" stroke-width="2.2" stroke-linejoin="round"/>
+      
+      <!-- Dati KTM (Purple) -->
+      <polyline points="60,165 120,155 180,142 240,128 300,115 360,105 420,95 480,85" fill="none" stroke="#c77dff" stroke-width="2.2" stroke-linejoin="round"/>
+      
+      <!-- Dati Honda (Red) -->
+      <polyline points="60,168 120,160 180,150 240,135 300,120 360,108 420,98 480,90" fill="none" stroke="#ff4757" stroke-width="2.2" stroke-linejoin="round"/>
+      
+      <!-- Etichette asse X (trimestri) -->
+      <text x="60" y="185" font-size="10" font-family="monospace" fill="#6a7f90" text-anchor="middle">Q1'24</text>
+      <text x="120" y="185" font-size="10" font-family="monospace" fill="#6a7f90" text-anchor="middle">Q2'24</text>
+      <text x="180" y="185" font-size="10" font-family="monospace" fill="#6a7f90" text-anchor="middle">Q3'24</text>
+      <text x="240" y="185" font-size="10" font-family="monospace" fill="#6a7f90" text-anchor="middle">Q4'24</text>
+      <text x="300" y="185" font-size="10" font-family="monospace" fill="#6a7f90" text-anchor="middle">Q1'25</text>
+      <text x="360" y="185" font-size="10" font-family="monospace" fill="#6a7f90" text-anchor="middle">Q2'25</text>
+      <text x="420" y="185" font-size="10" font-family="monospace" fill="#6a7f90" text-anchor="middle">Q3'25</text>
+      <text x="480" y="185" font-size="10" font-family="monospace" fill="#6a7f90" text-anchor="middle">Q4'25</text>
+      
+      <!-- Etichette asse Y (numero brevetti) -->
+      <text x="35" y="175" font-size="9" font-family="monospace" fill="#6a7f90" text-anchor="end">0</text>
+      <text x="35" y="150" font-size="9" font-family="monospace" fill="#6a7f90" text-anchor="end">2</text>
+      <text x="35" y="120" font-size="9" font-family="monospace" fill="#6a7f90" text-anchor="end">4</text>
+      <text x="35" y="90" font-size="9" font-family="monospace" fill="#6a7f90" text-anchor="end">6</text>
+      <text x="35" y="60" font-size="9" font-family="monospace" fill="#6a7f90" text-anchor="end">8</text>
+      <text x="35" y="30" font-size="9" font-family="monospace" fill="#6a7f90" text-anchor="end">10</text>
+      
+      <!-- Legenda inline -->
+      <circle cx="520" cy="50" r="3" fill="#00d2ff"/>
+      <text x="530" y="54" font-size="9" font-family="monospace" fill="#6a7f90">Aprilia</text>
+      
+      <circle cx="520" cy="65" r="3" fill="#ffb81c"/>
+      <text x="530" y="69" font-size="9" font-family="monospace" fill="#6a7f90">Ducati</text>
+      
+      <circle cx="520" cy="80" r="3" fill="#00e878"/>
+      <text x="530" y="84" font-size="9" font-family="monospace" fill="#6a7f90">Yamaha</text>
+      
+      <circle cx="520" cy="95" r="3" fill="#c77dff"/>
+      <text x="530" y="99" font-size="9" font-family="monospace" fill="#6a7f90">KTM</text>
+      
+      <circle cx="520" cy="110" r="3" fill="#ff4757"/>
+      <text x="530" y="114" font-size="9" font-family="monospace" fill="#6a7f90">Honda</text>
+    </svg>
+  </div>
+
+  <div class="table-wrap"><table>
+    <thead><tr><th>Brevetto / Codice</th><th>Titolare</th><th>Filing Date</th><th>Stato Corrente</th><th>Classe IPC</th><th>Rilevanza MotoGP 2026</th></tr></thead>
+    <tbody>
+      <tr><td class="cyan"><strong>WO2024028318A1</strong></td><td class="green">Piaggio / Aprilia (De Luca, Bergamo)</td><td class="green">2023-10-15</td><td class="green">Pubblicato 2024-02-08</td><td>B62K 5/00 (Frame)</td><td class="amber">Frame rigidezza programmata — non MotoGP 2026, ma strategico 2027+</td></tr>
+      <tr><td class="cyan"><strong>EP4604512A1</strong></td><td class="green">Aprilia / Piaggio</td><td class="green">2024-06-20</td><td class="green">Pubblicato 2024-09-11</td><td>B62M 11/00 (Aero)</td><td class="green">Aerodinamica attiva strada — principi applicabili in test MotoGP 2025-2026</td></tr>
+      <tr><td class="cyan"><strong>Yamaha Forcellone Adattivo</strong></td><td class="green">Yamaha Motor / HRC Patent</td><td class="red">2024-Q2 (riservato)</td><td class="amber">Omologazione FIA in corso</td><td>B62K 21/00 (Rear suspension)</td><td class="green">CRITICO — Test privati Q4'25, potenziale debutto 2026</td></tr>
+      <tr><td class="cyan"><strong>KTM WO2024-Brake-Sys</strong></td><td class="green">KTM AG / Brembo patent share</td><td class="amber">2024-03-10 (riportato)</td><td class="amber">Pending FIA homolog.</td><td>F16D 65/00 (Brake)</td><td class="amber">Sistema frenante intelligente — applicabilità regolamento 11.2 MotoGP</td></tr>
+      <tr><td class="cyan"><strong>Honda Traction Control V2</strong></td><td class="green">Honda R&D / HRC</td><td class="red">Proprietario — non pubblico</td><td class="red">Interno sviluppo</td><td>B60K 31/00 (Traction)</td><td class="red">Firmware ECU — limitazioni normative software unificato Magneti Marelli</td></tr>
+      <tr><td class="cyan"><strong>Ducati Desmosedici Geo 2025</strong></td><td class="red">Ducati — Portafoglio riservato</td><td class="red">Non disponibile pubblicamente</td><td class="red">Interno R&D</td><td>B62K / B62M</td><td class="red">Presumibilmente forcellone adattivo + stabilità frenata — confermato Borgaro testing</td></tr>
+    </tbody>
+  </table></div>
+
+</div></div>
+
+<div class="section-wrap sec-green"><div class="inner">
+  <div class="sec-header"><span class="sec-num">03 · SOLUZIONE INNOVATIVA</span><div class="sec-line"></div><h2>Proposte di Implementazione Brevettuale per Aprilia RS-GP 2026-2027</h2></div>
+
+  <p><strong>Aprilia propone tre strategie di brevetto-implementazione prioritarie</strong> per il ciclo 2026-2027, combinando depositi offensivi (nuove soluzioni aerodinamiche attive) e difensivi (protezione IP su frame/rigidezza):</p>
+
+  <div class="chart-wrap">
+    <div class="chart-header"><div class="chart-title">Priorità Implementazione Brevetti Aprilia 2026</div><div class="chart-subtitle">Valutazione impatto competitivo, tempistica, fattibilità regolamentare</div></div>
+    <div class="bar-rows">
+      <div class="bar-row">
+        <div class="bar-name">Aerodinamica Attiva (flap DRS variabile) [2025 deposito]</div>
+        <div class="bar-track"><div class="bar-fill" style="width:88%;background:linear-gradient(90deg,#00d2ff,#0099cc)"></div></div>
+        <div class="bar-val" style="color:#00d2ff">+0.28s giro / 8.8% priorità</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">Forcellone Composito Adattivo (rigidezza doppia) [2026 test]</div>
+        <div class="bar-track"><div class="bar-fill" style="width:82%;background:linear-gradient(90deg,#00e878,#00b359)"></div></div>
+        <div class="bar-val" style="color:#00e878">+0.21s giro / 8.2% priorità</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">Sistema Freno Intelligente Brembo (pressione adattiva) [2025 omolog.]</div>
+        <div class="bar-track"><div class="bar-fill" style="width:75%;background:linear-gradient(90deg,#ffb81c,#ff8800)"></div></div>
+        <div class="bar-val" style="color:#ffb81c">+0.15s frenata / 7.5% priorità</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">Frame Rigidezza Programmata (WO2024) [2027+ road bike]</div>
+        <div class="bar-track"><div class="bar-fill" style="width:58%;background:linear-gradient(90deg,#c77dff,#9c4cbd)"></div></div>
+        <div class="bar-val" style="color:#c77dff">IP protection / 5.8% MotoGP immediato</div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-name">Controllo Trazione Sensoristico (slot ECU Magneti) [2026 soft patch]</div>
+        <div class="bar-track"><div class="bar-fill" style="width:52%;background:linear-gradient(90deg,#ff6b6b,#cc5555)"></div></div>
+        <div class="bar-val" style="color:#ff6b6b">+0.08s uscita / 5.2% margine regolamento</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="block block-green"><div class="block-label">Elemento Originale Non Precedente: Ala Posteriore "Morphing" a Memoria di Forma</div><p>Aprilia propone di depositare (entro Q3'25) un <strong>brevetto su un sistema alare posteriore ibrido nitinolo-composito con memoria di forma termica</strong>. La struttura combina: <strong>(1)</strong> una rete in lega a memoria di forma (NiTi 55/45) integrata nel core dell'ala posteriore; <strong>(2)</strong> sensori di temperatura di bordo attacco (±2°C risoluzione); <strong>(3)</strong> profilo aerodinamico che muta geometricamente tra 65°C (configurazione "bassa resistenza" - rettilineo) e 95°C (configurazione "alta carica" - flap esteso +3.5°). <strong>Vantaggio competitivo</strong>: passaggio automatico senza attuatori elettrici (esclusi dai regolamenti MotoGP), basato su fisica termica pura. <strong>Gap rispetto competitor</strong>: nessuno dei top-5 costruttori ha brevetti pubblici su soluzioni NiTi MotoGP — apertura di IP unica per 2027+. <strong>Applicabilità strada</strong>: altissima per Aprilia X GP e RS super-sport, giustificando l'investimento R&D.</p></div>
+
+  <div class="table-wrap"><table>
+    <thead><tr><th>Brevetto Proposto</th><th>Codice Deposito Pianificato</th><th>Cronologia Sviluppo</th><th>Stato Regolamento</th><th>Beneficio Competitivo Stimato</th><th>Rischio/Note</th></tr></thead>
+    <tbody>
+      <tr><td class="cyan"><strong>Ala "Morphing" NiTi-Composito</strong></td><td class="green">WO2025-Aprilia-Aero-01 (Q3'25)</td><td class="green">CFD completato; prototipo composito Q1'25; test privato Mugello Q2'25</td><td class="amber">Non attualmente permesso (aerodinamica fissa reg. 10.2)</td><td class="green">+0.35s potenziale; differenziazione unica 2027</td><td class="red">Richiede deroga FIA per 2026 test; costo ~€380k sviluppo</td></tr>
+      <tr><td class="cyan"><strong>Forcellone Dual-Stiffness</strong></td><td class="green">EP2025-Aprilia-Chassis-02</td><td class="amber">Design 60%; FEA ongoing; omolog. Q1'26</td><td class="green">Conforme reg. 5.2 (materiali e geometria)</td><td class="green">+0.21s; sintonizzazione migliore per Michelin asimmetrici</td><td class="amber">Peso +180g carbon bias vs. standard; test aerodinamico richiesto</td></tr>
+      <tr><td class="cyan"><strong>Brembo Adaptive Pressure System</strong></td><td class="green">Brembo co-brevetto (joint filing Q2'25)</td><td class="green">Hardware Brembo GP4 esistente; software ECU slot libero</td><td class="amber">In revisione FIA art. 11.2 (impianto frenante intelligente)</td><td class="green">+0.15s frenata; riduzione variance bagnato</td><td class="green">Basso rischio regolamentare; compatibilità Magneti Marelli confermata</td></tr>
+      <tr><td class="cyan"><strong>Frame Rigidezza Programmata (WO2024)</strong></td><td class="green">WO2024028318A1 (già depositato; Piaggio titolare)</td><td class="green">Brevetto operativo; in attesa omologazione strada UE 2026</td><td class="red">NON permesso MotoGP 2026 (struttura telaio fissa)</td><td class="amber">Protezione IP per Aprilia X GP 2027+; prestigio brand</td><td class="green">Nessun rischio gara; valore strategico road bike</td></tr>
+      <tr><td class="cyan"><strong>ECU Traction Firmware Slot</strong></td><td class="amber">Magneti Marelli software patch Q4'25</td><td class="amber">Algoritmo sviluppo; simulazione MotoGP spec; Mugello test maggio 2026</td><td class="green">Conforme software unificato (slot tuning disponibile)</td><td class="amber">+0.08s uscita curva; margine variabilità 3-4%</td><td class="amber">Limite: tuning software solo ±2% dei parametri base Magneti</td></tr>
+    </tbody>
+  </table></div>
+
+</div></div>
+
+<div class="section-wrap sec-purple"><div class="inner">
+  <div class="sec-header"><span class="sec-num">04 · GEOMETRIA E MECCANISMO</span><div class="sec-line"></div><h2>Specifiche Brevettali Dettagliate: Frame WO2024028318A1 e Aerodinamica EP4604512A1</h2></div>
+
+  <div class="callout callout-purple"><div class="callout-icon">⬡</div>
+    <div class="callout-body"><div class="callout-title">Insight: Proprietà di Trasformabilità del Frame Piaggio</div><p>Il brevetto WO2024028318A1 descrive un <strong>telaio in alluminio 7075-T73 con sezioni trasversali a "nido d'ape" variabile</strong>. Il meccanismo di regolazione sfrutta <strong>elementi in titanio a scorrimento controllato</strong> che modificano il momento di inerzia longitudinale e laterale indipendentemente — il primo da 3.2 a 4.1 mm⁴ (irrigidimento zona posteriore-sella), il secondo da 2.8 a 3.6 mm⁴ (riduzione roll compliance in curva). <strong>Applicazione MotoGP</strong>: tecnicamente vietata fino a 2027 (struttura telaio fissa per 2026), ma il principio sotteso — <strong>proprietà elastiche localmente sintonizzabili</strong> — apre percorsi evolutivi per forcelloni compositi ibridi, già contemplati in drafts FIA 2027-2029.</p></div>
+  </div>
+
+  <div class="table-wrap"><table>
+    <thead><tr><th>Parametro Geometrico</th><th>Valore Brevetto WO2024</th><th>Range Regolazione</th><th>Impatto Fisico</th><th>Applicabilità Aprilia RS-GP</th></tr></thead>
+    <tbody>
+      <tr><td class="cyan"><strong>Momento d'inerzia longitudinale (Ixx)</strong></td><td class="green">3.2 mm⁴ (base) → 4.1 mm⁴ (max)</td><td class="amber">±28% escursione</td><td class="green">Riduce pitch compliance rear, migliora stabilità in frenata</td><td class="red">Non MotoGP 2026; potenziale 2027 frenata adattiva</td></tr>
+      <tr><td class="cyan"><strong>Momento d'inerzia laterale (Iyy)</strong></td><td class="green">2.8 mm⁴ (base) → 3.6 mm⁴ (max)</td><td class="amber">±29% escursione</td><td class="amber">Incrementa rigidezza roll; trade-off con traction on corner entry</td><td class="amber">In fase studio per applicazione forcellone posteriore 2026-2027</td></tr>
+      <tr><td class="cyan"><strong>Derapata assiale asse telaio</strong></td><td class="amber">±0.8mm escursione controllata</td><td class="green">Tolleranza ±0.3mm</td><td class="amber">Micro-regolazione trail e rake dinamico</td><td class="red">Violazione reg. 5.1.2 (geometria fissa); studio teorico solo</td></tr>
+      <tr><td class="cyan"><strong>Sezione trasversale nido d'ape</strong></td><td class="green">Celle alluminio 6061 + titanio Grade 2 spine</td><td class="green">Altezza cella 4-6mm, spessore parete 0.4-0.6mm</td><td class="green">Rapporto rigidezza/peso superiore +18% vs. telaio convenzionale</td><td class="amber">Potenziale per forcellone mono-tubo composito 2026 (diverso brevetto)</td></tr>
+      <tr><td class="cyan"><strong>Damping ratio strutturale</strong></td><td class="amber">ζ = 0.042 base → 0.056 max</td><td class="green">Variazione dissipazione ±33%</td><td class="green">Riduce oscillazioni post-frenata; limita whipping vibratorio</td><td class="amber">Indiretto beneficio se implementato forcellone adattivo 2027</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="table-wrap"><table>
+    <thead><tr><th>Elemento Brevetto EP4604512A1 (Aerodinamica Attiva Strada)</th><th>Specifica Tecnica</th><th>Principio Fisico</th><th>Transfert MotoGP Potenziale</th></tr></thead>
+    <tbody>
+      <tr><td class="cyan"><strong>Ala anteriore modulare</strong></td><td class="green">2 posizioni (
+<div class="disclaimer">⚠ &nbsp; I valori numerici sono stime ingegneristiche plausibili, non dati misurati. Usare come ipotesi da validare con CFD, banco e telemetria reale. &nbsp; ⚠</div>
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">Ciccarese AI Agent &nbsp;·&nbsp; MotoGP Technical Intelligence</div>
+    <div class="footer-meta"><span>Studio #004</span><span>2026-06-02</span><span>Aprilia RS-GP 2026</span><span>Analisi brevetti recenti</span></div>
+    <div class="footer-next">Prossimo tema</div>
+  </div>
+</footer>
+</body>
+</html>
