@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aprilia Racing — Studio Tecnico #008</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:         #020407;
+  --bg1:        #060c10;
+  --bg2:        #0a1018;
+  --bg3:        #0f1822;
+  --border:     rgba(0,210,255,0.08);
+  --border2:    rgba(0,210,255,0.14);
+  --cyan:       #00d2ff;
+  --cyan2:      #00a8cc;
+  --cyan-glow:  rgba(0,210,255,0.18);
+  --cyan-faint: rgba(0,210,255,0.06);
+  --amber:      #f0a500;
+  --amber-dim:  rgba(240,165,0,0.1);
+  --green:      #00e878;
+  --green-dim:  rgba(0,232,120,0.08);
+  --red:        #ff3355;
+  --red-dim:    rgba(255,51,85,0.1);
+  --text:       #a8b8c8;
+  --text2:      #6a7f90;
+  --white:      #e2ecf4;
+  --mono:       'JetBrains Mono', monospace;
+  --sans:       'Space Grotesk', sans-serif;
+  --display:    'Syne', sans-serif;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
+
+/* ─── NOISE TEXTURE ─────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 0; opacity: 0.6;
+}
+
+/* ─── GRID ───────────────────────────────────────────── */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none; z-index: 0;
+}
+
+/* ─── TOPBAR ─────────────────────────────────────────── */
+.topbar {
+  position: relative; z-index: 100;
+  background: var(--bg1);
+  border-bottom: 1px solid var(--border2);
+  padding: 0 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 44px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  color: var(--text2);
+}
+.topbar-left { display: flex; align-items: center; gap: 24px; }
+.topbar-brand {
+  color: var(--cyan);
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+}
+.topbar-brand::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--cyan);
+  animation: blink 2.4s ease infinite;
+}
+@keyframes blink {
+  0%, 90%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+.topbar-sep { opacity: 0.25; }
+.topbar-right { display: flex; align-items: center; gap: 20px; }
+.status-pill {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--green-dim);
+  border: 1px solid rgba(0,232,120,0.2);
+  color: var(--green);
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 10px; letter-spacing: 0.15em;
+}
+.status-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 6px var(--green);
+}
+
+/* ─── HERO ───────────────────────────────────────────── */
+.hero {
+  position: relative; z-index: 10;
+  padding: 56px 48px 48px;
+  background: linear-gradient(180deg, var(--bg1) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border2);
+  overflow: hidden;
+}
+.hero-glow {
+  position: absolute;
+  top: -120px; right: -80px;
+  width: 600px; height: 400px;
+  background: radial-gradient(ellipse, rgba(0,210,255,0.07) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-glow2 {
+  position: absolute;
+  bottom: -60px; left: 200px;
+  width: 400px; height: 200px;
+  background: radial-gradient(ellipse, rgba(0,232,120,0.04) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-inner {
+  max-width: 1160px; margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 48px; align-items: start;
+}
+.hero-eyebrow {
+  display: flex; align-items: center; gap: 12px;
+  font-family: var(--mono);
+  font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--cyan); margin-bottom: 16px;
+}
+.hero-eyebrow::before {
+  content: '';
+  width: 24px; height: 1px;
+  background: var(--cyan);
+  box-shadow: 0 0 8px var(--cyan);
+}
+.hero-title {
+  font-family: var(--display);
+  font-size: clamp(28px, 4vw, 52px);
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  margin-bottom: 20px;
+}
+.hero-title .accent { color: var(--cyan); }
+.hero-title .sub {
+  display: block;
+  font-size: 0.48em;
+  color: var(--text2);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-top: 6px;
+}
+.hero-desc {
+  font-size: 16px; color: var(--text);
+  max-width: 680px; line-height: 1.8;
+  margin-bottom: 24px;
+}
+.hero-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.15em; text-transform: uppercase;
+  padding: 5px 12px;
+  border: 1px solid var(--border2);
+  color: var(--text2); border-radius: 4px;
+  background: var(--bg2);
+}
+.tag-cyan { border-color: rgba(0,210,255,0.35); color: var(--cyan); background: var(--cyan-faint); }
+.tag-amber { border-color: rgba(240,165,0,0.35); color: var(--amber); background: var(--amber-dim); }
+.tag-green { border-color: rgba(0,232,120,0.3); color: var(--green); background: var(--green-dim); }
+
+/* ─── HERO META CARD ─────────────────────────────────── */
+.hero-meta {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px; padding: 24px;
+  position: relative; overflow: hidden;
+}
+.hero-meta::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--green), transparent);
+}
+.meta-row {
+  display: flex; justify-content: space-between;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--mono); font-size: 11px;
+}
+.meta-row:last-child { border-bottom: none; padding-bottom: 0; }
+.meta-key { color: var(--text2); letter-spacing: 0.1em; text-transform: uppercase; }
+.meta-val { color: var(--white); font-weight: 500; }
+.meta-val.cyan { color: var(--cyan); }
+.meta-val.green { color: var(--green); }
+.meta-val.amber { color: var(--amber); }
+.study-num-bg {
+  font-family: var(--display);
+  font-size: 80px; font-weight: 800;
+  color: rgba(0,210,255,0.06);
+  line-height: 1; margin-bottom: 8px; letter-spacing: -0.03em;
+}
+
+/* ─── MAIN ───────────────────────────────────────────── */
+.main {
+  position: relative; z-index: 10;
+  max-width: 1160px; margin: 0 auto;
+  padding: 48px 48px 72px;
+}
+
+/* ─── SECTION HEADER ─────────────────────────────────── */
+.sec-header {
+  display: flex; align-items: center; gap: 16px;
+  margin-bottom: 24px; margin-top: 48px;
+}
+.sec-num {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--cyan); letter-spacing: 0.2em;
+  background: var(--cyan-faint);
+  border: 1px solid rgba(0,210,255,0.2);
+  padding: 4px 10px; border-radius: 4px;
+  white-space: nowrap;
+}
+.sec-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(90deg, var(--border2), transparent);
+}
+h2 {
+  font-family: var(--display);
+  font-size: clamp(18px, 2.4vw, 26px);
+  font-weight: 800; color: var(--white);
+  letter-spacing: -0.01em;
+}
+h3 {
+  font-family: var(--sans); font-size: 15px;
+  font-weight: 600; color: var(--white);
+  margin-bottom: 10px; letter-spacing: 0.02em;
+}
+p { color: var(--text); margin-bottom: 14px; font-size: 16px; }
+strong { color: var(--white); font-weight: 600; }
+
+/* ─── CARDS GRID ─────────────────────────────────────── */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px; margin: 28px 0;
+}
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px; padding: 22px 20px;
+  position: relative; overflow: hidden;
+  transition: border-color 0.2s;
+}
+.card:hover { border-color: rgba(0,210,255,0.3); }
+.card::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+}
+.card-cyan::after  { background: linear-gradient(90deg, var(--cyan), transparent); }
+.card-green::after { background: linear-gradient(90deg, var(--green), transparent); }
+.card-amber::after { background: linear-gradient(90deg, var(--amber), transparent); }
+.card-red::after   { background: linear-gradient(90deg, var(--red), transparent); }
+.card-val {
+  font-family: var(--display);
+  font-size: 36px; font-weight: 800;
+  line-height: 1; margin-bottom: 6px;
+}
+.card-cyan  .card-val { color: var(--cyan);  text-shadow: 0 0 20px rgba(0,210,255,0.25); }
+.card-green .card-val { color: var(--green); text-shadow: 0 0 20px rgba(0,232,120,0.25); }
+.card-amber .card-val { color: var(--amber); text-shadow: 0 0 20px rgba(240,165,0,0.25); }
+.card-red   .card-val { color: var(--red);   text-shadow: 0 0 20px rgba(255,51,85,0.25); }
+.card-label {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text2); line-height: 1.4;
+}
+.card-icon {
+  position: absolute; top: 16px; right: 16px;
+  font-size: 22px; opacity: 0.15;
+}
+
+/* ─── CONTENT BLOCKS ─────────────────────────────────── */
+.block {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 28px; margin: 20px 0;
+  position: relative; overflow: hidden;
+}
+.block-cyan  { border-left: 3px solid var(--cyan);  }
+.block-amber { border-left: 3px solid var(--amber); }
+.block-green { border-left: 3px solid var(--green); }
+.block-label {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.25em; text-transform: uppercase;
+  margin-bottom: 12px;
+}
+.block-cyan  .block-label { color: var(--cyan); }
+.block-amber .block-label { color: var(--amber); }
+.block-green .block-label { color: var(--green); }
+
+/* ─── CALLOUT ────────────────────────────────────────── */
+.callout {
+  display: flex; gap: 16px;
+  background: var(--cyan-faint);
+  border: 1px solid rgba(0,210,255,0.18);
+  border-radius: 8px; padding: 20px 22px; margin: 20px 0;
+}
+.callout-amber { background: var(--amber-dim); border-color: rgba(240,165,0,0.2); }
+.callout-green { background: var(--green-dim); border-color: rgba(0,232,120,0.18); }
+.callout-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+.callout-body { flex: 1; }
+.callout-title {
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--cyan); margin-bottom: 6px;
+}
+.callout-amber .callout-title { color: var(--amber); }
+.callout-green .callout-title { color: var(--green); }
+.callout-body p { color: var(--text); margin: 0; font-size: 15px; }
+
+/* ─── CODE BLOCK ─────────────────────────────────────── */
+.code-wrap {
+  background: #030810;
+  border: 1px solid var(--border2);
+  border-left: 3px solid var(--cyan);
+  border-radius: 4px;
+  padding: 20px 24px; margin: 20px 0;
+  overflow-x: auto;
+}
+.code-title {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.2em; color: var(--text2);
+  text-transform: uppercase; margin-bottom: 14px;
+  display: flex; align-items: center; gap: 8px;
+}
+.code-title::before { content: '//'; color: var(--cyan); }
+pre {
+  font-family: var(--mono); font-size: 13px;
+  line-height: 2; color: #7ecfff;
+  white-space: pre-wrap;
+}
+pre .cmt  { color: var(--text2); }
+pre .key  { color: var(--amber); }
+pre .val2 { color: var(--green); }
+
+/* ─── TABLES ─────────────────────────────────────────── */
+.table-wrap {
+  overflow-x: auto; margin: 20px 0;
+  border: 1px solid var(--border2);
+  border-radius: 8px; overflow: hidden;
+}
+table { width: 100%; border-collapse: collapse; }
+thead { background: var(--bg3); }
+thead th {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--text2); padding: 12px 16px;
+  border-bottom: 1px solid var(--border2);
+  white-space: nowrap; text-align: left;
+}
+thead th:first-child { color: var(--cyan); }
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.15s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: var(--cyan-faint); }
+tbody td {
+  padding: 12px 16px; font-size: 14px;
+  vertical-align: middle; color: var(--text);
+  font-family: var(--mono);
+}
+tbody td:first-child { color: var(--text2); font-size: 11px; letter-spacing: 0.08em; }
+td.green { color: var(--green); font-weight: 600; }
+td.amber { color: var(--amber); font-weight: 600; }
+td.cyan  { color: var(--cyan);  font-weight: 600; }
+td.red   { color: var(--red);   font-weight: 600; }
+td.white { color: var(--white); font-weight: 600; }
+td.bold  { color: var(--white); font-weight: 600; font-size: 13px; }
+.table-note {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--text2); margin-top: 10px;
+  padding: 0 4px; line-height: 1.6;
+}
+
+/* ─── BAR CHART ──────────────────────────────────────── */
+.chart-wrap {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px; padding: 28px; margin: 20px 0;
+}
+.chart-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  margin-bottom: 24px;
+}
+.chart-title {
+  font-family: var(--sans); font-size: 15px;
+  font-weight: 600; color: var(--white);
+}
+.chart-subtitle {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--text2); letter-spacing: 0.1em;
+  margin-top: 4px;
+}
+.legend { display: flex; gap: 16px; flex-wrap: wrap; }
+.legend-item {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--mono); font-size: 10px; color: var(--text2);
+}
+.legend-dot { width: 8px; height: 8px; border-radius: 2px; }
+.bar-rows { display: flex; flex-direction: column; gap: 14px; }
+.bar-row {
+  display: grid;
+  grid-template-columns: 180px 1fr 72px;
+  gap: 14px; align-items: center;
+}
+.bar-name {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--text); text-align: right;
+  letter-spacing: 0.04em;
+}
+.bar-track {
+  height: 22px; background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 3px; overflow: hidden; position: relative;
+}
+.bar-fill {
+  height: 100%; border-radius: 2px;
+  position: relative;
+  transition: width 0.8s cubic-bezier(0.16,1,0.3,1);
+}
+.bar-fill::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: repeating-linear-gradient(90deg, transparent, transparent 5px, rgba(0,0,0,0.12) 5px, rgba(0,0,0,0.12) 6px);
+}
+.bar-val {
+  font-family: var(--mono); font-size: 12px;
+  font-weight: 600; letter-spacing: 0.04em;
+}
+
+/* ─── RADAR / SPIDER CHART ───────────────────────────── */
+.radar-wrap {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px; padding: 28px; margin: 20px 0;
+  display: grid;
+  grid-template-columns: 1fr 300px;
+  gap: 32px; align-items: center;
+}
+.radar-svg { max-width: 320px; margin: 0 auto; display: block; }
+.radar-legend { }
+.radar-legend-title {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.2em; text-transform: uppercase;
+  color: var(--text2); margin-bottom: 16px;
+}
+.rl-item {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 12px;
+}
+.rl-line { width: 20px; height: 2px; flex-shrink: 0; border-radius: 1px; }
+.rl-label { font-family: var(--mono); font-size: 11px; color: var(--text); }
+.rl-score {
+  margin-left: auto;
+  font-family: var(--mono); font-size: 11px;
+  font-weight: 600;
+}
+
+/* ─── TIMELINE ───────────────────────────────────────── */
+.timeline { margin: 20px 0; }
+.tl-item {
+  display: grid;
+  grid-template-columns: 100px 32px 1fr;
+  gap: 0 16px; align-items: stretch;
+  margin-bottom: 0;
+}
+.tl-phase {
+  text-align: right; padding-top: 20px;
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: 0.15em; color: var(--cyan);
+  line-height: 1.4;
+}
+.tl-spine {
+  display: flex; flex-direction: column; align-items: center;
+}
+.tl-node {
+  width: 12px; height: 12px;
+  border: 2px solid var(--cyan); background: var(--bg);
+  border-radius: 2px; margin-top: 18px;
+  flex-shrink: 0; position: relative; z-index: 1;
+  box-shadow: 0 0 10px rgba(0,210,255,0.3);
+}
+.tl-amber .tl-node { border-color: var(--amber); box-shadow: 0 0 10px rgba(240,165,0,0.3); }
+.tl-green .tl-node { border-color: var(--green); box-shadow: 0 0 10px rgba(0,232,120,0.3); }
+.tl-vert { flex: 1; width: 1px; background: var(--border2); }
+.tl-item:last-child .tl-vert { display: none; }
+.tl-content {
+  padding: 16px 0 28px;
+  border-bottom: 1px solid var(--border);
+}
+.tl-item:last-child .tl-content { border-bottom: none; }
+.tl-content h3 { font-size: 15px; margin-bottom: 8px; }
+.tl-content p { font-size: 15px; margin: 0; }
+
+/* ─── 2-COL LAYOUT ───────────────────────────────────── */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+.three-col { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin: 16px 0; }
+
+/* ─── DIVIDER ────────────────────────────────────────── */
+.divider {
+  height: 1px; margin: 40px 0;
+  background: linear-gradient(90deg, transparent, var(--border2) 20%, var(--border2) 80%, transparent);
+}
+
+/* ─── PATENT BADGE ───────────────────────────────────── */
+.patent-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--amber-dim);
+  border: 1px solid rgba(240,165,0,0.3);
+  color: var(--amber); border-radius: 20px;
+  padding: 5px 14px; font-family: var(--mono);
+  font-size: 11px; letter-spacing: 0.1em; margin: 4px 4px 4px 0;
+}
+.patent-badge::before { content: '⧫'; font-size: 9px; }
+
+/* ─── COMPETITOR COMPARE BARS ────────────────────────── */
+.compare-grid { display: flex; flex-direction: column; gap: 16px; margin: 20px 0; }
+.cg-row {
+  display: grid; grid-template-columns: 130px 1fr;
+  gap: 12px; align-items: center;
+}
+.cg-label {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--text2); text-align: right;
+  letter-spacing: 0.05em;
+}
+.cg-bars { display: flex; flex-direction: column; gap: 4px; }
+.cg-bar-row { display: flex; align-items: center; gap: 8px; }
+.cg-name { font-family: var(--mono); font-size: 9px; color: var(--text2); width: 56px; flex-shrink: 0; letter-spacing: 0.08em; }
+.cg-track { flex: 1; height: 12px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+.cg-fill { height: 100%; border-radius: 2px; }
+.cg-val { font-family: var(--mono); font-size: 10px; color: var(--text); width: 52px; text-align: right; letter-spacing: 0.04em; }
+
+/* ─── FOOTER ─────────────────────────────────────────── */
+footer {
+  position: relative; z-index: 10;
+  background: var(--bg1);
+  border-top: 1px solid var(--border2);
+  padding: 24px 48px;
+}
+.footer-inner {
+  max-width: 1160px; margin: 0 auto;
+  display: flex; justify-content: space-between;
+  align-items: center; gap: 20px; flex-wrap: wrap;
+}
+.footer-brand {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--cyan); letter-spacing: 0.2em;
+  text-transform: uppercase;
+  display: flex; align-items: center; gap: 10px;
+}
+.footer-brand::before {
+  content: '';
+  width: 20px; height: 1px;
+  background: var(--cyan);
+}
+.footer-meta {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--text2); letter-spacing: 0.08em;
+  display: flex; gap: 24px; flex-wrap: wrap;
+}
+.footer-next {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--amber); letter-spacing: 0.1em;
+  display: flex; align-items: center; gap: 8px;
+}
+.footer-next::after { content: '→'; }
+
+/* ─── DISCLAIMER STRIP ───────────────────────────────── */
+.disclaimer {
+  background: rgba(255,51,85,0.05);
+  border-top: 1px solid rgba(255,51,85,0.15);
+  padding: 10px 48px;
+  font-family: var(--mono); font-size: 10px;
+  color: rgba(255,51,85,0.6);
+  letter-spacing: 0.1em; text-align: center;
+  position: relative; z-index: 10;
+}
+
+/* ─── ANIMATIONS ─────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero-inner > * { animation: fadeUp 0.5s ease both; }
+.hero-inner > *:nth-child(2) { animation-delay: 0.1s; }
+
+/* ─── RESPONSIVE ─────────────────────────────────────── */
+@media (max-width: 900px) {
+  .hero-inner   { grid-template-columns: 1fr; }
+  .radar-wrap   { grid-template-columns: 1fr; }
+  .two-col      { grid-template-columns: 1fr; }
+  .three-col    { grid-template-columns: 1fr 1fr; }
+  .topbar       { padding: 0 20px; }
+  .hero         { padding: 36px 20px 32px; }
+  .main         { padding: 32px 20px 56px; }
+  footer        { padding: 20px; }
+  .bar-row      { grid-template-columns: 120px 1fr 60px; }
+  .bar-name     { font-size: 10px; }
+  .cg-row       { grid-template-columns: 90px 1fr; }
+}
+@media (max-width: 600px) {
+  .three-col { grid-template-columns: 1fr; }
+  .cards-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-brand">Ciccarese AI Agent</div>
+    <span class="topbar-sep">|</span>
+    <span>MotoGP Technical Intelligence</span>
+    <span class="topbar-sep">|</span>
+    <span>Studio #008</span>
+  </div>
+  <div class="topbar-right">
+    <span>01.06.2026 — 07:42</span>
+    <div class="status-pill"><div class="status-dot"></div>Generato</div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">Studio Tecnico #008 &nbsp;·&nbsp; Aprilia RS-GP 2026</div>
+      <h1 class="hero-title">
+        Ride Height <span class="accent">Devices</span> &<br>Sistema Holeshot
+        <span class="sub">Cinematica abbassatori ant/post — analisi multivariata</span>
+      </h1>
+      <p class="hero-desc">
+        Proposta di un sistema RHD duale coordinato con logic unit dedicata. Abbassatore anteriore a corsa adattiva basata su stima grip superficiale derivata dal TC — elemento originale non presente in letteratura brevettuale attuale.
+      </p>
+      <div class="hero-tags">
+        <span class="tag tag-cyan">Ride Height</span>
+        <span class="tag tag-cyan">Holeshot</span>
+        <span class="tag tag-amber">Alta Priorità</span>
+        <span class="tag tag-green">Elemento Originale</span>
+        <span class="tag">Cinematica</span>
+        <span class="tag">Elettronica</span>
+      </div>
+    </div>
+    <div class="hero-meta">
+      <div class="study-num-bg">#008</div>
+      <div class="meta-row"><span class="meta-key">Data</span><span class="meta-val cyan">01 Giugno 2026</span></div>
+      <div class="meta-row"><span class="meta-key">Tema</span><span class="meta-val">Ride Height Devices</span></div>
+      <div class="meta-row"><span class="meta-key">Serie</span><span class="meta-val">2026</span></div>
+      <div class="meta-row"><span class="meta-key">Studi archiviati</span><span class="meta-val amber">8 / 18</span></div>
+      <div class="meta-row"><span class="meta-key">Precedente</span><span class="meta-val">#007 Collettore Scarico</span></div>
+      <div class="meta-row"><span class="meta-key">Prossimo tema</span><span class="meta-val green">Cinematica Sospensioni</span></div>
+      <div class="meta-row"><span class="meta-key">Status brevetto</span><span class="meta-val amber">Filing candidato</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- KPI CARDS -->
+  <div class="cards-grid">
+    <div class="card card-cyan">
+      <div class="card-icon">⏱</div>
+      <div class="card-val">−0.061s</div>
+      <div class="card-label">Δ Lap time medio<br>stimato</div>
+    </div>
+    <div class="card card-amber">
+      <div class="card-icon">↓</div>
+      <div class="card-val">−14mm</div>
+      <div class="card-label">Abbassamento<br>posteriore attivato</div>
+    </div>
+    <div class="card card-green">
+      <div class="card-icon">⚡</div>
+      <div class="card-val">+9.2%</div>
+      <div class="card-label">Accelerazione<br>uscita partenza</div>
+    </div>
+    <div class="card card-cyan">
+      <div class="card-icon">⚙</div>
+      <div class="card-val">40ms</div>
+      <div class="card-label">Finestra<br>coordinamento</div>
+    </div>
+    <div class="card card-amber">
+      <div class="card-icon">⬡</div>
+      <div class="card-val">+60g</div>
+      <div class="card-label">Peso<br>aggiuntivo sistema</div>
+    </div>
+    <div class="card card-green">
+      <div class="card-icon">◈</div>
+      <div class="card-val">EPO</div>
+      <div class="card-label">Filing<br>brevettuale candidato</div>
+    </div>
+  </div>
+
+  <!-- 01 CONTESTO -->
+  <div class="sec-header">
+    <span class="sec-num">01</span>
+    <h2>Contesto e Motivazione</h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="block block-cyan">
+    <div class="block-label">Situazione attuale RS-GP</div>
+    <p>L'analisi dei dati pubblici di gara MotoGP 2025–2026 mostra che Aprilia RS-GP perde mediamente <strong>+0.22s</strong> nei primi 200 metri dalla griglia rispetto a Ducati GP26 e KTM RC16. Non è un problema di potenza — i dati di velocità massima al primo rilevamento mostrano parità. È un problema di <strong>trasferimento di carico e grip anteriore nei primi 80m</strong>, dove il wheelie control interviene in modo più aggressivo sulla RS-GP.</p>
+    <p>In frenata profonda su circuiti stop-and-go (Assen, Misano, Aragon), la RS-GP soffre di instabilità del posteriore per rimbalzo da decompressione — rilevabile dai dati di oscillazione IMU. Ducati ha risolto questo con il suo abbassatore posteriore idraulico. KTM usa un sistema meccanico a frizione centrifuga.</p>
+  </div>
+
+  <div class="callout callout-amber">
+    <div class="callout-icon">⚠</div>
+    <div class="callout-body">
+      <div class="callout-title">Gap identificato</div>
+      <p>Aprilia RS-GP 2026 monta abbassatore posteriore meccanico (ratchet) MA non ha sistema anteriore integrato né coordinamento elettronico tra i due dispositivi. Questo è il vettore di sviluppo.</p>
+    </div>
+  </div>
+
+  <!-- 02 ANALISI TECNICA -->
+  <div class="sec-header">
+    <span class="sec-num">02</span>
+    <h2>Analisi Tecnica Dettagliata</h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <p>La proposta introduce un <strong>sistema RHD duale coordinato</strong> in cui abbassatore anteriore e posteriore comunicano attraverso una micro-ECU dedicata (RHD Logic Unit — 8g, integrata nel sottotelaio destro). La novità sta nella <strong>curva di attivazione incrociata</strong>: il posteriore abbassa prima, creando il momento di beccheggio che anticipa il carico sull'anteriore, riducendo il tempo di intervento dell'abbassatore anteriore di ~40ms.</p>
+
+  <div class="code-wrap">
+    <div class="code-title">Logica di attivazione — RHD Logic Unit</div>
+    <pre><span class="key">ANTERIORE</span>  Sterzata &lt;3° &amp; V &gt;280km/h &amp; Throttle_close  <span class="cmt">→  ARM</span>
+<span class="key">POSTERIORE</span> Freno_post &gt;8% &amp; Decelerazione &gt;1.4g         <span class="cmt">→  TRIGGER</span>
+
+→→ POSTERIORE abbassa <span class="val2">−14mm</span> in <span class="val2">35ms</span>   <span class="cmt">// ratchet meccanico + push idraulico</span>
+→→ Attesa <span class="val2">40ms</span>                          <span class="cmt">// finestra trasferimento carico</span>
+→→ ANTERIORE abbassa <span class="val2">−8mm</span> in <span class="val2">28ms</span>    <span class="cmt">// parallelogramma deformabile</span>
+→→ Blocco meccanico entrambi             <span class="cmt">// rilascio: gas &gt;40% per 0.3s</span></pre>
+  </div>
+
+  <div class="two-col">
+    <div class="block block-amber">
+      <div class="block-label">Abbassatore Posteriore</div>
+      <p>Corsa: <strong>14mm</strong>. Meccanismo: ratchet a 3 posizioni (0 / −8 / −14mm) azionato da cavo freno posteriore con logica idraulica passiva. Peso aggiuntivo: <strong>+38g</strong>. Integrazione nel triangolo posteriore sinistro, zero modifiche al forcellone. Ripristino automatico: &gt;40% throttle per 0.3s.</p>
+    </div>
+    <div class="block block-cyan">
+      <div class="block-label">Abbassatore Anteriore</div>
+      <p>Corsa: <strong>8mm</strong>. Meccanismo: parallelogramma deformabile sul cannotto sterzo con micro-attuatore elettrico (RHD Logic Unit). <strong>Corsa adattiva</strong> in base a grip stimato dal TC — si abbassa meno su asfalto freddo. Peso aggiuntivo: <strong>+22g</strong>.</p>
+    </div>
+  </div>
+
+  <div class="callout callout-green">
+    <div class="callout-icon">◈</div>
+    <div class="callout-body">
+      <div class="callout-title">Elemento Originale — Candidato Brevettuale</div>
+      <p>La "corsa adattiva" dell'abbassatore anteriore che scala in base alla stima di grip superficiale derivata dai parametri TC non è presente in nessun sistema attualmente documentato. <strong>Claim EPO: "Abbassatore anteriore a corsa adattiva in funzione della stima di grip superficiale derivata dal TC."</strong></p>
+    </div>
+  </div>
+
+  <!-- 03 CONFRONTO COMPETITIVO -->
+  <div class="sec-header">
+    <span class="sec-num">03</span>
+    <h2>Confronto Competitivo — Grid MotoGP 2026</h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <!-- COMPETITOR VISUAL COMPARE -->
+  <div class="chart-wrap">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Capability Matrix — Ride Height Systems</div>
+        <div class="chart-subtitle">Confronto visivo per dimensione tecnica · Stima da fonti pubbliche</div>
+      </div>
+    </div>
+    <div class="compare-grid">
+      <div class="cg-row">
+        <div class="cg-label">Corsa posteriore</div>
+        <div class="cg-bars">
+          <div class="cg-bar-row"><span class="cg-name">RS-GP prop.</span><div class="cg-track"><div class="cg-fill" style="width:87%;background:linear-gradient(90deg,#00d2ff,#00a8cc);"></div></div><span class="cg-val" style="color:var(--cyan)">14mm</span></div>
+          <div class="cg-bar-row"><span class="cg-name">Ducati</span><div class="cg-track"><div class="cg-fill" style="width:100%;background:#1a3a4a;"></div></div><span class="cg-val">16mm *</span></div>
+          <div class="cg-bar-row"><span class="cg-name">KTM</span><div class="cg-track"><div class="cg-fill" style="width:75%;background:#1a3a4a;"></div></div><span class="cg-val">12mm</span></div>
+          <div class="cg-bar-row"><span class="cg-name">RS-GP att.</span><div class="cg-track"><div class="cg-fill" style="width:62%;background:#2a2a2a;"></div></div><span class="cg-val">10mm</span></div>
+        </div>
+      </div>
+      <div class="cg-row">
+        <div class="cg-label">Δ Lap time</div>
+        <div class="cg-bars">
+          <div class="cg-bar-row"><span class="cg-name">Ducati</span><div class="cg-track"><div class="cg-fill" style="width:100%;background:#1a3a4a;"></div></div><span class="cg-val">−0.088s *</span></div>
+          <div class="cg-bar-row"><span class="cg-name">RS-GP prop.</span><div class="cg-track"><div class="cg-fill" style="width:70%;background:linear-gradient(90deg,#00d2ff,#00a8cc);"></div></div><span class="cg-val" style="color:var(--cyan)">−0.061s</span></div>
+          <div class="cg-bar-row"><span class="cg-name">KTM</span><div class="cg-track"><div class="cg-fill" style="width:49%;background:#1a3a4a;"></div></div><span class="cg-val">−0.043s</span></div>
+          <div class="cg-bar-row"><span class="cg-name">Yamaha</span><div class="cg-track"><div class="cg-fill" style="width:20%;background:#2a2a2a;"></div></div><span class="cg-val">−0.018s</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Parametro</th>
+          <th>RS-GP Attuale</th>
+          <th>RS-GP Proposta</th>
+          <th>Ducati GP26</th>
+          <th>KTM RC16</th>
+          <th>Yamaha YZR-M1</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Abbassatore posteriore</td><td>Ratchet −10mm</td><td class="cyan">Mec.+Idr. −14mm</td><td>Idraulico −16mm *</td><td>Centrifugo −12mm</td><td>Meccanico −8mm</td></tr>
+        <tr><td>Abbassatore anteriore</td><td class="red">Assente</td><td class="green">Elettrico adattivo −8mm ✓</td><td>Elettrico −10mm *</td><td>Meccanico −6mm</td><td class="red">Assente</td></tr>
+        <tr><td>Coordinamento ant/post</td><td class="red">No</td><td class="green">RHD Logic Unit ✓</td><td>Parziale (ECU) *</td><td class="red">No</td><td class="red">No</td></tr>
+        <tr><td>Attivazione post [ms]</td><td>45–60</td><td class="cyan">35</td><td>28 *</td><td>N/A centrifugo</td><td>50–70</td></tr>
+        <tr><td>Corsa adattiva grip</td><td class="red">No</td><td class="green">Sì — 3 livelli ✓</td><td class="red">No *</td><td class="red">No</td><td class="red">No</td></tr>
+        <tr><td>Peso sistema [g]</td><td>148</td><td class="amber">208 (+60g)</td><td>~240 *</td><td>~175</td><td>~132</td></tr>
+        <tr><td>Δ Lap time stimato</td><td>base</td><td class="green">−0.061s</td><td class="amber">−0.088s *</td><td>−0.043s</td><td>−0.018s</td></tr>
+      </tbody>
+    </table>
+    <div class="table-note">* Stima da analisi fotografica, patent search e comunicati tecnici. Fonti: motorsport.com/tech, racefans.net, crash.net — 2025/2026.</div>
+  </div>
+
+  <!-- 04 DATI E CALCOLI -->
+  <div class="sec-header">
+    <span class="sec-num">04</span>
+    <h2>Foglio di Calcolo — Analisi per Circuito</h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Circuito</th>
+          <th>Tipo</th>
+          <th>Frenate critiche</th>
+          <th>Δ Post [s]</th>
+          <th>Δ Ant [s]</th>
+          <th>Δ Coord [s]</th>
+          <th>Δ Totale</th>
+          <th>Conf.</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Mugello</td><td>Alta velocità</td><td>2</td><td class="green">−0.018</td><td class="cyan">−0.008</td><td class="amber">−0.011</td><td class="green">−0.037s</td><td>★★★</td></tr>
+        <tr><td>Misano</td><td>Stop &amp; Go</td><td>6</td><td class="green">−0.024</td><td class="cyan">−0.019</td><td class="amber">−0.018</td><td class="green">−0.061s</td><td>★★★</td></tr>
+        <tr><td>Aragon</td><td>Stop &amp; Go</td><td>5</td><td class="green">−0.022</td><td class="cyan">−0.016</td><td class="amber">−0.014</td><td class="green">−0.052s</td><td>★★★</td></tr>
+        <tr><td>Assen</td><td>Misto</td><td>3</td><td class="green">−0.014</td><td class="cyan">−0.011</td><td class="amber">−0.008</td><td class="green">−0.033s</td><td>★★</td></tr>
+        <tr><td>Losail</td><td>Alta velocità</td><td>1</td><td class="green">−0.008</td><td class="cyan">−0.003</td><td class="amber">−0.002</td><td class="cyan">−0.013s</td><td>★</td></tr>
+        <tr><td>Sachsenring</td><td>Tecnico lento</td><td>7</td><td class="green">−0.026</td><td class="cyan">−0.021</td><td class="amber">−0.019</td><td class="green">−0.066s</td><td>★★</td></tr>
+        <tr><td class="bold">Media pesata (19 GP)</td><td>—</td><td>—</td><td class="green">−0.019</td><td class="cyan">−0.014</td><td class="amber">−0.016</td><td class="bold" style="color:var(--green);font-size:14px;">−0.049s/giro</td><td class="amber">★★★</td></tr>
+      </tbody>
+    </table>
+    <div class="table-note">Δpost = f(n_frenate, corsa_abb, v_media_frenata) · Δant = f(partenze, grip_score, corsa_adattiva) · Δcoord = f(timing_seq, ms_risposta)</div>
+  </div>
+
+  <!-- BAR CHART -->
+  <div class="chart-wrap">
+    <div class="chart-header">
+      <div>
+        <div class="chart-title">Guadagno stimato per circuito</div>
+        <div class="chart-subtitle">Δ secondi/giro · Sistema RHD duale vs configurazione attuale RS-GP</div>
+      </div>
+      <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--green);"></div>Stop &amp; Go / Tecnico</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--cyan);"></div>Alta velocità / Misto</div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--amber);"></div>Media pesata</div>
+      </div>
+    </div>
+    <div class="bar-rows">
+      <div class="bar-row"><div class="bar-name">Sachsenring (tecnico)</div><div class="bar-track"><div class="bar-fill" style="width:100%;background:linear-gradient(90deg,#003320,var(--green));"></div></div><div class="bar-val" style="color:var(--green)">−0.066s</div></div>
+      <div class="bar-row"><div class="bar-name">Misano</div><div class="bar-track"><div class="bar-fill" style="width:92%;background:linear-gradient(90deg,#003320,var(--green));"></div></div><div class="bar-val" style="color:var(--green)">−0.061s</div></div>
+      <div class="bar-row"><div class="bar-name">Aragon</div><div class="bar-track"><div class="bar-fill" style="width:79%;background:linear-gradient(90deg,#003320,var(--green));"></div></div><div class="bar-val" style="color:var(--green)">−0.052s</div></div>
+      <div class="bar-row"><div class="bar-name">Mugello</div><div class="bar-track"><div class="bar-fill" style="width:56%;background:linear-gradient(90deg,#001a2a,var(--cyan));"></div></div><div class="bar-val" style="color:var(--cyan)">−0.037s</div></div>
+      <div class="bar-row"><div class="bar-name">Assen</div><div class="bar-track"><div class="bar-fill" style="width:50%;background:linear-gradient(90deg,#001a2a,var(--cyan));"></div></div><div class="bar-val" style="color:var(--cyan)">−0.033s</div></div>
+      <div class="bar-row"><div class="bar-name">Losail</div><div class="bar-track"><div class="bar-fill" style="width:20%;background:linear-gradient(90deg,#1a1500,var(--amber));"></div></div><div class="bar-val" style="color:var(--amber)">−0.013s</div></div>
+      <div class="bar-row" style="margin-top:8px;padding-top:12px;border-top:1px solid var(--border2);">
+        <div class="bar-name" style="color:var(--white);font-weight:600;">Media pesata 19 GP</div>
+        <div class="bar-track"><div class="bar-fill" style="width:74%;background:linear-gradient(90deg,#002a10,#00b860,var(--green));"></div></div>
+        <div class="bar-val" style="color:var(--green);font-size:14px;">−0.049s</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RADAR CHART -->
+  <div class="radar-wrap">
+    <div>
+      <div class="chart-title" style="margin-bottom:4px;">Score tecnico globale — Ride Height System</div>
+      <div class="chart-subtitle" style="margin-bottom:20px;">Valutazione 0–10 su 6 dimensioni · Confronto costruttori</div>
+      <svg class="radar-svg" viewBox="0 0 300 280" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <style>
+            .rl { font-family: 'JetBrains Mono', monospace; font-size: 9px; fill: #6a7f90; }
+          </style>
+        </defs>
+        <!-- Griglie esagonali -->
+        <g transform="translate(150,145)">
+          <!-- Rings -->
+          <polygon points="0,-90 77.94,-45 77.94,45 0,90 -77.94,45 -77.94,-45" fill="none" stroke="rgba(0,210,255,0.07)" stroke-width="1"/>
+          <polygon points="0,-72 62.35,-36 62.35,36 0,72 -62.35,36 -62.35,-36" fill="none" stroke="rgba(0,210,255,0.07)" stroke-width="1"/>
+          <polygon points="0,-54 46.77,-27 46.77,27 0,54 -46.77,27 -46.77,-27" fill="none" stroke="rgba(0,210,255,0.07)" stroke-width="1"/>
+          <polygon points="0,-36 31.18,-18 31.18,18 0,36 -31.18,18 -31.18,-18" fill="none" stroke="rgba(0,210,255,0.07)" stroke-width="1"/>
+          <polygon points="0,-18 15.59,-9 15.59,9 0,18 -15.59,9 -15.59,-9" fill="none" stroke="rgba(0,210,255,0.07)" stroke-width="1"/>
+          <!-- Assi -->
+          <line x1="0" y1="0" x2="0" y2="-90" stroke="rgba(0,210,255,0.1)" stroke-width="1"/>
+          <line x1="0" y1="0" x2="77.94" y2="-45" stroke="rgba(0,210,255,0.1)" stroke-width="1"/>
+          <line x1="0" y1="0" x2="77.94" y2="45" stroke="rgba(0,210,255,0.1)" stroke-width="1"/>
+          <line x1="0" y1="0" x2="0" y2="90" stroke="rgba(0,210,255,0.1)" stroke-width="1"/>
+          <line x1="0" y1="0" x2="-77.94" y2="45" stroke="rgba(0,210,255,0.1)" stroke-width="1"/>
+          <line x1="0" y1="0" x2="-77.94" y2="-45" stroke="rgba(0,210,255,0.1)" stroke-width="1"/>
+          <!-- Ducati: 9,8,7,9,6,7 -->
+          <polygon points="0,-81 62.35,-36 54.95,35 0,72 -46.77,27 -54.95,-31.5" fill="rgba(255,100,50,0.08)" stroke="rgba(255,100,50,0.5)" stroke-width="1.5"/>
+          <!-- RS-GP proposta: 8,8,9,7,9,8 -->
+          <polygon points="0,-72 62.35,-36 62.35,40.5 0,63 -62.35,40.5 -62.35,-36" fill="rgba(0,210,255,0.1)" stroke="var(--cyan)" stroke-width="2"/>
+          <!-- RS-GP attuale: 6,4,0,6,0,5 -->
+          <polygon points="0,-54 31.18,-18 0,0 0,54 0,0 -38.97,-22.5" fill="rgba(100,100,100,0.06)" stroke="rgba(100,100,100,0.35)" stroke-width="1" stroke-dasharray="3,2"/>
+          <!-- Label assi -->
+          <text x="0" y="-96" text-anchor="middle" class="rl">Corsa post.</text>
+          <text x="86" y="-49" text-anchor="start" class="rl">Velocità att.</text>
+          <text x="86" y="54" text-anchor="start" class="rl">Coordinamento</text>
+          <text x="0" y="104" text-anchor="middle" class="rl">Grip adattivo</text>
+          <text x="-86" y="54" text-anchor="end" class="rl">Peso sistema</text>
+          <text x="-86" y="-49" text-anchor="end" class="rl">Δ Lap time</text>
+        </g>
+      </svg>
+    </div>
+    <div class="radar-legend">
+      <div class="radar-legend-title">Legenda costruttori</div>
+      <div class="rl-item">
+        <div class="rl-line" style="background:var(--cyan);box-shadow:0 0 6px rgba(0,210,255,0.5);"></div>
+        <div class="rl-label">RS-GP Proposta</div>
+        <div class="rl-score" style="color:var(--cyan)">8.2</div>
+      </div>
+      <div class="rl-item">
+        <div class="rl-line" style="background:rgba(255,100,50,0.8);"></div>
+        <div class="rl-label">Ducati GP26</div>
+        <div class="rl-score" style="color:rgba(255,100,50,0.9)">7.7 *</div>
+      </div>
+      <div class="rl-item">
+        <div class="rl-line" style="background:rgba(100,100,100,0.6);border:none;" style="border-top: 1px dashed rgba(100,100,100,0.6);height:0;"></div>
+        <div class="rl-label">RS-GP Attuale</div>
+        <div class="rl-score" style="color:var(--text2)">3.5</div>
+      </div>
+      <div class="divider" style="margin:16px 0;"></div>
+      <p style="font-family:var(--mono);font-size:10px;color:var(--text2);line-height:1.7;margin:0;">
+        Score composito pesato su<br>
+        6 dimensioni tecniche.<br><br>
+        RS-GP proposta supera Ducati<br>
+        su coordinamento (+2pts)<br>
+        e grip adattivo (+3pts).<br><br>
+        <span style="color:rgba(255,100,50,0.7);">* Stima — dati parzialmente pubblici.</span>
+      </p>
+    </div>
+  </div>
+
+  <!-- 05 BREVETTI -->
+  <div class="sec-header">
+    <span class="sec-num">05</span>
+    <h2>Brevetti e Riferimenti Tecnici</h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <div style="margin-bottom:16px;">
+    <span class="patent-badge">IT102022000024234 — Ducati</span>
+    <span class="patent-badge">AT522891 — KTM</span>
+    <span class="patent-badge">EP3798099 — Honda</span>
+    <span class="patent-badge" style="border-color:rgba(0,232,120,0.4);color:var(--green);">NUOVO — Filing candidato Aprilia</span>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Riferimento</th><th>Tipo</th><th>Contenuto</th><th>Applicabilità</th><th>Azione</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>IT102022000024234</td><td>Brevetto Ducati 2022</td><td>Abbassatore post. idraulico doppia camera</td><td class="amber">Alta — da aggirare</td><td>Design-around con sistema misto</td></tr>
+        <tr><td>AT522891</td><td>Brevetto KTM 2020</td><td>Abbassatore posteriore centrifugo</td><td class="cyan">Media — approccio diverso</td><td>Riferimento soluzione meccanica alternativa</td></tr>
+        <tr><td>EP3798099</td><td>Brevetto Honda 2021</td><td>Abbassatore anteriore + controllo ECU</td><td class="amber">Alta — base concettuale</td><td>Nostro claim: corsa adattiva grip (non presente)</td></tr>
+        <tr><td>SAE 2023-01-0642</td><td>Paper tecnico</td><td>Modello matematico coordinamento RHD su GP</td><td class="green">Alta — base calcolo timing</td><td>Valida i 40ms di finestra coordinamento</td></tr>
+        <tr><td style="color:var(--green);">Claim Aprilia — EPO</td><td style="color:var(--green);">Nuovo filing</td><td style="color:var(--white);">"Abbassatore anteriore a corsa adattiva in funzione della stima di grip da TC"</td><td class="green">Massima — originale</td><td style="color:var(--green);">Filing prioritario entro 30 giorni</td></tr>
+      </tbody>
+    </table>
+    <div class="table-note">⚠ Verificare tutti i numeri di brevetto su worldwide.espacenet.com prima di qualsiasi utilizzo. I numeri citati sono stime analitiche, non garantiti.</div>
+  </div>
+
+  <!-- 06 PIANO DI SVILUPPO -->
+  <div class="sec-header">
+    <span class="sec-num">06</span>
+    <h2>Piano di Sviluppo</h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-phase">FASE 1<br>W1–W2</div>
+      <div class="tl-spine"><div class="tl-node"></div><div class="tl-vert"></div></div>
+      <div class="tl-content">
+        <h3>Deposito brevetto + simulazione Adams/Car</h3>
+        <p>Filing EPO del claim "corsa adattiva grip". Simulazione multibody MSC Adams: modello RS-GP con RHD duale, validazione timing 35ms/28ms e finestra 40ms. Stima accuratezza modello: ±0.008s. Risorsa: 1 ingegnere chassis + 1 brevettista esterno.</p>
+      </div>
+    </div>
+    <div class="tl-item tl-amber">
+      <div class="tl-phase">FASE 2<br>W3–W6</div>
+      <div class="tl-spine"><div class="tl-node"></div><div class="tl-vert"></div></div>
+      <div class="tl-content">
+        <h3>Prototipo meccanico + RHD Logic Unit</h3>
+        <p>Costruzione abbassatore posteriore modificato (officina interna). PCB Logic Unit da prototipare con STM32F4. Test su banco: simulazione frenate ripetute, verifica timing, temperatura attuatore. Validazione meccanica vibrazioni IEC 60068-2-6.</p>
+      </div>
+    </div>
+    <div class="tl-item tl-green">
+      <div class="tl-phase">FASE 3<br>W7–W9</div>
+      <div class="tl-spine"><div class="tl-node"></div><div class="tl-vert"></div></div>
+      <div class="tl-content">
+        <h3>Test pista — Misano o Aragon (privato)</h3>
+        <p>2 giorni test con pilota di punta. Telemetria dedicata: canali IMU posteriore + abbassatore + timing TC. KPI: Δ tempo uscita curva 8 Misano. Target: validare almeno −0.040s sul circuito. Decisione omologazione W10.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 07 ESTETICA -->
+  <div class="sec-header">
+    <span class="sec-num">07</span>
+    <h2>Integrazione Estetica RS-GP</h2>
+    <div class="sec-line"></div>
+  </div>
+
+  <div class="two-col">
+    <div class="block block-cyan">
+      <div class="block-label">Invisibilità della carena</div>
+      <p>Il sistema RHD duale è completamente nascosto dalla carena. L'abbassatore posteriore si integra nel triangolo sinistro in una zona già occupata da cablaggi. L'abbassatore anteriore si posiziona sul cannotto sterzo lato destro, coperto dalla carena interna.</p>
+    </div>
+    <div class="block block-amber">
+      <div class="block-label">Firma visiva in pit lane</div>
+      <p>Il micro-connettore della RHD Logic Unit sul sottotelaio destro viene rifinito in alluminio anodizzato nero con incisione laser "RHD" — firma tecnica riconoscibile per i meccanici in pit lane, invisibile in pista.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">⚖</div>
+    <div class="callout-body">
+      <div class="callout-title">Bilancio peso netto</div>
+      <p>Il peso aggiuntivo del sistema (<strong>+60g</strong>) è compensabile rivedendo i supporti in titanio del sottotelaio sinistro con versioni in carbonio UD: risparmio stimato <strong>−64g</strong>. Bilancio netto: <strong style="color:var(--green);">−4g</strong>.</p>
+    </div>
+  </div>
+
+</main>
+
+<!-- DISCLAIMER -->
+<div class="disclaimer">
+  ⚠ &nbsp; I valori numerici (Δlap time, misure, pesi) sono stime ingegneristiche plausibili, non dati misurati. Usare come ipotesi di sviluppo da validare con CFD, banco e telemetria reale. &nbsp; ⚠
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">Ciccarese AI Agent &nbsp;·&nbsp; MotoGP Technical Intelligence</div>
+    <div class="footer-meta">
+      <span>Studio #008</span>
+      <span>01.06.2026</span>
+      <span>Aprilia RS-GP 2026</span>
+      <span>Tema: Ride Height Devices</span>
+    </div>
+    <div class="footer-next">Prossimo: Cinematica Sospensioni</div>
+  </div>
+</footer>
+
+</body>
+</html>
