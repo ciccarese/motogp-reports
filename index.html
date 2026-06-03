@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ciccarese AI Agent — MotoGP Technical Reports</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:    #020407;
+  --bg1:   #060c10;
+  --bg2:   #0a1018;
+  --bg3:   #0f1822;
+  --border:  rgba(0,210,255,.08);
+  --border2: rgba(0,210,255,.16);
+  --cyan:  #00d2ff;
+  --cf:    rgba(0,210,255,.06);
+  --amber: #f0a500;
+  --green: #00e878;
+  --red:   #ff3355;
+  --text:  #a8b8c8;
+  --text2: #6a7f90;
+  --white: #e2ecf4;
+  --mono:  'JetBrains Mono', monospace;
+  --sans:  'Space Grotesk', sans-serif;
+  --disp:  'Syne', sans-serif;
+}
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.7;
+  min-height: 100vh;
+}
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(var(--border) 1px, transparent 1px),
+    linear-gradient(90deg, var(--border) 1px, transparent 1px);
+  background-size: 48px 48px;
+  pointer-events: none; z-index: 0;
+}
+
+/* TOPBAR */
+.topbar {
+  position: relative; z-index: 100;
+  background: var(--bg1);
+  border-bottom: 1px solid var(--border2);
+  padding: 0 48px; height: 44px;
+  display: flex; justify-content: space-between; align-items: center;
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: .12em; color: var(--text2);
+}
+.tb-brand {
+  color: var(--cyan); font-weight: 600;
+  letter-spacing: .2em; text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+}
+.tb-brand::before {
+  content: '';
+  width: 6px; height: 6px;
+  background: var(--cyan); border-radius: 50%;
+  box-shadow: 0 0 10px var(--cyan);
+  animation: blink 2.4s ease infinite;
+}
+@keyframes blink { 0%,90%,100%{opacity:1} 50%{opacity:.2} }
+.pill {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(0,232,120,.08);
+  border: 1px solid rgba(0,232,120,.22);
+  color: var(--green); padding: 3px 10px;
+  border-radius: 20px; font-size: 10px; letter-spacing: .15em;
+}
+.pill-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--green); box-shadow: 0 0 6px var(--green);
+}
+
+/* HERO */
+.hero {
+  position: relative; z-index: 10;
+  padding: 64px 48px 52px;
+  background: linear-gradient(180deg, var(--bg1) 0%, transparent 100%);
+  border-bottom: 1px solid var(--border2);
+  overflow: hidden;
+}
+.hero-glow {
+  position: absolute; top: -80px; right: -40px;
+  width: 500px; height: 340px;
+  background: radial-gradient(ellipse, rgba(0,210,255,.06) 0%, transparent 65%);
+  pointer-events: none;
+}
+.hero-inner { max-width: 860px; margin: 0 auto; }
+.eyebrow {
+  display: flex; align-items: center; gap: 10px;
+  font-family: var(--mono); font-size: 11px;
+  letter-spacing: .28em; text-transform: uppercase;
+  color: var(--cyan); margin-bottom: 16px;
+}
+.eyebrow::before { content:''; width:20px; height:1px; background:var(--cyan); }
+h1 {
+  font-family: var(--disp);
+  font-size: clamp(28px, 4.5vw, 56px);
+  font-weight: 800; color: var(--white);
+  line-height: 1.1; letter-spacing: -.01em;
+  margin-bottom: 18px;
+}
+h1 span { color: var(--cyan); }
+.hero-sub {
+  font-size: 16px; color: var(--text);
+  max-width: 600px; line-height: 1.8;
+  margin-bottom: 28px;
+}
+.hero-stats {
+  display: flex; gap: 32px; flex-wrap: wrap;
+}
+.stat {
+  font-family: var(--mono);
+}
+.stat-val {
+  font-family: var(--disp);
+  font-size: 32px; font-weight: 800;
+  color: var(--cyan); line-height: 1;
+  text-shadow: 0 0 16px rgba(0,210,255,.25);
+}
+.stat-label {
+  font-size: 10px; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--text2);
+  margin-top: 4px;
+}
+
+/* MAIN */
+.main {
+  position: relative; z-index: 10;
+  max-width: 860px; margin: 0 auto;
+  padding: 48px 48px 80px;
+}
+
+/* SECTION HEADER */
+.sh {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 24px;
+}
+.sn {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--cyan); letter-spacing: .2em;
+  background: var(--cf);
+  border: 1px solid rgba(0,210,255,.2);
+  padding: 4px 10px; border-radius: 4px;
+}
+.sl { flex:1; height:1px; background: linear-gradient(90deg, var(--border2), transparent); }
+h2 {
+  font-family: var(--disp);
+  font-size: clamp(18px, 2.3vw, 24px);
+  font-weight: 800; color: var(--white);
+}
+
+/* REPORT LIST */
+.report-list {
+  display: flex; flex-direction: column; gap: 10px;
+  margin-bottom: 40px;
+}
+.report-item {
+  display: flex; align-items: center;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 8px;
+  padding: 16px 20px;
+  text-decoration: none;
+  transition: border-color .2s, background .2s;
+  position: relative; overflow: hidden;
+  gap: 16px;
+}
+.report-item::before {
+  content: '';
+  position: absolute; left:0; top:0; bottom:0; width:2px;
+  background: var(--cyan); opacity: .5;
+  transition: opacity .2s;
+}
+.report-item:hover {
+  border-color: rgba(0,210,255,.35);
+  background: rgba(0,210,255,.04);
+}
+.report-item:hover::before { opacity: 1; }
+.report-num {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--text2); letter-spacing: .12em;
+  flex-shrink: 0; width: 40px;
+}
+.report-info { flex: 1; min-width: 0; }
+.report-title {
+  font-family: var(--sans); font-size: 15px;
+  font-weight: 600; color: var(--white);
+  margin-bottom: 3px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.report-meta {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--text2); letter-spacing: .1em;
+  display: flex; gap: 12px; flex-wrap: wrap;
+}
+.report-date { color: var(--cyan); }
+.report-arrow {
+  font-family: var(--mono); font-size: 14px;
+  color: var(--cyan); opacity: .4;
+  flex-shrink: 0; transition: opacity .2s, transform .2s;
+}
+.report-item:hover .report-arrow { opacity: 1; transform: translateX(3px); }
+
+/* THEME BADGE */
+.theme-badge {
+  font-family: var(--mono); font-size: 9px;
+  letter-spacing: .14em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 3px;
+  border: 1px solid rgba(0,210,255,.25);
+  color: var(--cyan); background: var(--cf);
+  flex-shrink: 0;
+}
+
+/* LOADING / EMPTY / ERROR */
+.state-msg {
+  text-align: center;
+  padding: 48px 24px;
+  font-family: var(--mono); font-size: 13px;
+  color: var(--text2); letter-spacing: .1em;
+}
+.spinner {
+  display: inline-block;
+  width: 20px; height: 20px;
+  border: 2px solid var(--border2);
+  border-top-color: var(--cyan);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+  margin-bottom: 12px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* FOOTER */
+footer {
+  position: relative; z-index: 10;
+  background: var(--bg1);
+  border-top: 1px solid var(--border2);
+  padding: 20px 48px;
+}
+.fi {
+  max-width: 860px; margin: 0 auto;
+  display: flex; justify-content: space-between;
+  align-items: center; gap: 16px; flex-wrap: wrap;
+}
+.fb {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--cyan); letter-spacing: .18em;
+  text-transform: uppercase;
+  display: flex; align-items: center; gap: 9px;
+}
+.fb::before { content:''; width:18px; height:1px; background:var(--cyan); }
+.fm {
+  font-family: var(--mono); font-size: 10px;
+  color: var(--text2); letter-spacing: .08em;
+}
+
+@media (max-width: 700px) {
+  .topbar, .hero, .main, footer { padding-left: 20px; padding-right: 20px; }
+  .hero { padding-top: 40px; padding-bottom: 36px; }
+  .hero-stats { gap: 20px; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-brand">Ciccarese AI Agent</div>
+  <div style="display:flex;align-items:center;gap:16px">
+    <span>MotoGP Technical Intelligence</span>
+    <div class="pill"><div class="pill-dot"></div><span id="status-text">Caricamento...</span></div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="eyebrow">Archivio Studi Tecnici &nbsp;·&nbsp; Aprilia RS-GP 2026</div>
+    <h1>MotoGP Technical<br><span>Reports</span></h1>
+    <p class="hero-sub">Studi tecnici quotidiani su Aprilia Racing: aerodinamica, scarico, sospensioni, CFD, brevetti, elettronica e dati telemetrici.</p>
+    <div class="hero-stats">
+      <div class="stat">
+        <div class="stat-val" id="count-total">—</div>
+        <div class="stat-label">Report totali</div>
+      </div>
+      <div class="stat">
+        <div class="stat-val" id="count-latest" style="font-size:18px;padding-top:6px">—</div>
+        <div class="stat-label">Ultimo aggiornamento</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<main class="main">
+  <div class="sh">
+    <span class="sn">01</span>
+    <h2>Report disponibili</h2>
+    <div class="sl"></div>
+  </div>
+
+  <div id="report-list" class="report-list">
+    <div class="state-msg">
+      <div class="spinner"></div><br>
+      Recupero lista report...
+    </div>
+  </div>
+</main>
+
+<footer>
+  <div class="fi">
+    <div class="fb">Ciccarese AI Agent &nbsp;·&nbsp; MotoGP Technical Intelligence</div>
+    <div class="fm">Aggiornato automaticamente ad ogni nuovo upload</div>
+  </div>
+</footer>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────
+// Cambia con il tuo username e nome repo GitHub
+const GITHUB_USER = 'ciccarese';
+const GITHUB_REPO = 'motogp-reports';
+const REPORTS_DIR = 'reports';
+
+// ─── TEMA LABEL da ID ────────────────────────────────────────────────────
+const THEME_LABELS = {
+  aero_front:        'Aerodinamica anteriore',
+  aero_rear:         'Aerodinamica posteriore',
+  exhaust_geometry:  'Geometria collettori scarico',
+  exhaust_valves:    'Valvole e sezioni scarico',
+  suspension_kin:    'Cinematica sospensioni',
+  engine_combustion: 'Camera di combustione',
+  engine_thermal:    'Gestione termica motore',
+  frame_rigidity:    'Rigidità telaio',
+  electronics_tc:    'Elettronica trazione',
+  cfd_flow:          'Ottimizzazione CFD',
+  patent_analysis:   'Analisi brevetti',
+  tire_thermal:      'Gestione termica gomme',
+  data_patterns:     'Pattern telemetrici',
+  weight_cog:        'Distribuzione peso/CoG',
+  airbox_intake:     'Airbox e aspirazione',
+  materials_advanced:'Materiali avanzati',
+  ride_height:       'Ride height & Holeshot',
+  ride_height_devices:'Ride height devices',
+  gearbox_shifting:  'Trasmissione e cambio',
+};
+
+function parseFilename(name) {
+  // es: 2026-06-01_ride_height_devices.html
+  const m = name.match(/^(\d{4}-\d{2}-\d{2})_(.+)\.html$/);
+  if (!m) return null;
+  const date   = m[1];
+  const themeId = m[2];
+  const label  = THEME_LABELS[themeId] || themeId.replace(/_/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
+  return { date, themeId, label, name };
+}
+
+function formatDate(dateStr) {
+  const [y,mo,d] = dateStr.split('-');
+  const months = ['Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic'];
+  return `${parseInt(d)} ${months[parseInt(mo)-1]} ${y}`;
+}
+
+async function loadReports() {
+  const list = document.getElementById('report-list');
+  const apiUrl = `https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/contents/${REPORTS_DIR}`;
+
+  try {
+    const res = await fetch(apiUrl, {
+      headers: { 'Accept': 'application/vnd.github.v3+json' }
+    });
+
+    if (!res.ok) throw new Error(`GitHub API: ${res.status}`);
+
+    const files = await res.json();
+
+    // Filtra solo .html, ordina per data decrescente
+    const reports = files
+      .filter(f => f.name.endsWith('.html') && f.name !== 'index.html')
+      .map(f => ({ ...parseFilename(f.name), url: f.html_url.replace('/blob/', '/blob/') }))
+      .filter(r => r !== null)
+      .sort((a,b) => b.date.localeCompare(a.date));
+
+    if (reports.length === 0) {
+      list.innerHTML = '<div class="state-msg">Nessun report trovato nella cartella reports/</div>';
+      return;
+    }
+
+    // Aggiorna stats
+    document.getElementById('count-total').textContent = reports.length;
+    document.getElementById('count-latest').textContent = formatDate(reports[0].date);
+    document.getElementById('status-text').textContent = `${reports.length} report`;
+
+    // Genera lista
+    // Costruisci URL raw per aprire l'HTML direttamente nel browser
+    const rawBase = `https://raw.githack.com/${GITHUB_USER}/${GITHUB_REPO}/main/${REPORTS_DIR}/`;
+
+    list.innerHTML = reports.map((r, i) => `
+      <a class="report-item" href="${rawBase}${r.name}" target="_blank" rel="noopener">
+        <div class="report-num">#${String(reports.length - i).padStart(3,'0')}</div>
+        <div class="report-info">
+          <div class="report-title">${r.label}</div>
+          <div class="report-meta">
+            <span class="report-date">${formatDate(r.date)}</span>
+            <span>${r.date}</span>
+          </div>
+        </div>
+        <div class="theme-badge">${r.themeId.replace(/_/g,' ')}</div>
+        <div class="report-arrow">→</div>
+      </a>
+    `).join('');
+
+  } catch(e) {
+    list.innerHTML = `<div class="state-msg">
+      Errore nel recupero dei report.<br>
+      <span style="color:var(--red);font-size:11px">${e.message}</span><br><br>
+      <span style="font-size:10px">Verifica che il repo sia pubblico e che GITHUB_USER/GITHUB_REPO siano corretti.</span>
+    </div>`;
+    document.getElementById('status-text').textContent = 'Errore';
+    console.error(e);
+  }
+}
+
+loadReports();
+</script>
+</body>
+</html>
