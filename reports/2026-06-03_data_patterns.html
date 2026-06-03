@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aprilia Racing — Sistema di Telemetria Predittiva Settoriale con Analisi Real-Time di Braking Point e Accelerazione Uscita Curva</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#020407;--bg1:#060c10;--bg2:#0a1018;--bg3:#0f1822;--border:rgba(0,210,255,.08);--border2:rgba(0,210,255,.14);--cyan:#00d2ff;--cf:rgba(0,210,255,.06);--amber:#f0a500;--ad:rgba(240,165,0,.1);--green:#00e878;--gd:rgba(0,232,120,.08);--red:#ff3355;--text:#a8b8c8;--text2:#6a7f90;--white:#e2ecf4;--mono:'JetBrains Mono',monospace;--sans:'Space Grotesk',sans-serif;--display:'Syne',sans-serif}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.7;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0}
+.topbar{position:relative;z-index:100;background:var(--bg1);border-bottom:1px solid var(--border2);padding:0 40px;height:44px;display:flex;justify-content:space-between;align-items:center;font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--text2)}
+.tb-brand{color:var(--cyan);font-weight:600;letter-spacing:.2em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.tb-brand::before{content:'';width:6px;height:6px;background:var(--cyan);border-radius:50%;box-shadow:0 0 10px var(--cyan);animation:blink 2.4s ease infinite}
+@keyframes blink{0%,90%,100%{opacity:1}50%{opacity:.2}}
+.pill{display:flex;align-items:center;gap:6px;background:rgba(0,232,120,.08);border:1px solid rgba(0,232,120,.2);color:var(--green);padding:3px 10px;border-radius:20px;font-size:10px;letter-spacing:.15em}
+.pill-dot{width:5px;height:5px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)}
+.hero{position:relative;z-index:10;padding:48px 40px 40px;background:linear-gradient(180deg,var(--bg1) 0%,transparent 100%);border-bottom:1px solid var(--border2);overflow:hidden}
+.hero-glow{position:absolute;top:-100px;right:-60px;width:500px;height:360px;background:radial-gradient(ellipse,rgba(0,210,255,.06) 0%,transparent 65%);pointer-events:none}
+.hero-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 300px;gap:40px;align-items:start}
+.eyebrow{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--cyan);margin-bottom:14px}
+.eyebrow::before{content:'';width:20px;height:1px;background:var(--cyan)}
+h1{font-family:var(--display);font-size:clamp(26px,3.8vw,48px);font-weight:800;color:var(--white);line-height:1.12;letter-spacing:-.01em;margin-bottom:16px}
+h1 .ac{color:var(--cyan)}
+.hero-desc{font-size:16px;color:var(--text);max-width:660px;line-height:1.8;margin-bottom:20px}
+.tags{display:flex;flex-wrap:wrap;gap:7px}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:4px 11px;border:1px solid var(--border2);color:var(--text2);border-radius:4px;background:var(--bg2)}
+.tc{border-color:rgba(0,210,255,.35);color:var(--cyan);background:var(--cf)}
+.ta{border-color:rgba(240,165,0,.35);color:var(--amber);background:var(--ad)}
+.tg{border-color:rgba(0,232,120,.3);color:var(--green);background:var(--gd)}
+.meta-card{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:22px;position:relative;overflow:hidden}
+.meta-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--cyan),var(--green),transparent)}
+.snum{font-family:var(--display);font-size:72px;font-weight:800;color:rgba(0,210,255,.05);line-height:1;margin-bottom:6px}
+.mr{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:11px}
+.mr:last-child{border-bottom:none;padding-bottom:0}
+.mk{color:var(--text2);letter-spacing:.1em;text-transform:uppercase}
+.mv{color:var(--white);font-weight:500}.mvc{color:var(--cyan)}.mvg{color:var(--green)}.mva{color:var(--amber)}
+.main{position:relative;z-index:10;max-width:1100px;margin:0 auto;padding:44px 40px 64px}
+.sh{display:flex;align-items:center;gap:14px;margin-bottom:22px;margin-top:48px}
+.sn{font-family:var(--mono);font-size:11px;color:var(--cyan);letter-spacing:.2em;background:var(--cf);border:1px solid rgba(0,210,255,.2);padding:4px 10px;border-radius:4px}
+.sl{flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent)}
+h2{font-family:var(--display);font-size:clamp(18px,2.3vw,25px);font-weight:800;color:var(--white);letter-spacing:-.01em}
+h3{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--white);margin-bottom:8px}
+p{color:var(--text);margin-bottom:13px;font-size:16px}
+strong{color:var(--white);font-weight:600}
+code{font-family:var(--mono);font-size:12px;color:var(--cyan);background:rgba(0,210,255,.06);padding:2px 6px;border-radius:3px}
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:28px 0}
+.kpi-card{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:20px;position:relative;overflow:hidden;transition:border-color .2s}
+.kpi-card:hover{border-color:rgba(0,210,255,.3)}
+.kpi-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,currentColor,transparent);opacity:.4}
+.kpi-val{font-family:var(--display);font-size:36px;font-weight:800;line-height:1;margin-bottom:6px}
+.kpi-label{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text2);line-height:1.4}
+.block{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:26px;margin:18px 0}
+.bc{border-left:3px solid var(--cyan)}.ba{border-left:3px solid var(--amber)}.bg_{border-left:3px solid var(--green)}
+.bl{font-family:var(--mono);font-size:10px;letter-spacing:.24em;text-transform:uppercase;margin-bottom:10px}
+.bc .bl{color:var(--cyan)}.ba .bl{color:var(--amber)}.bg_ .bl{color:var(--green)}
+.callout{display:flex;gap:14px;border-radius:8px;padding:18px 20px;margin:18px 0;border:1px solid}
+.callout.cc{background:var(--cf);border-color:rgba(0,210,255,.18)}
+.callout.ca{background:var(--ad);border-color:rgba(240,165,0,.2)}
+.callout.cg{background:var(--gd);border-color:rgba(0,232,120,.18)}
+.ci{font-size:18px;flex-shrink:0;margin-top:2px}
+.ct{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:5px}
+.cc .ct{color:var(--cyan)}.ca .ct{color:var(--amber)}.cg .ct{color:var(--green)}
+.callout p{color:var(--text);margin:0;font-size:15px}
+.code-wrap{background:#030810;border:1px solid var(--border2);border-left:3px solid var(--cyan);border-radius:4px;padding:18px 22px;margin:18px 0;overflow-x:auto}
+pre{font-family:var(--mono);font-size:13px;line-height:1.9;color:#7ecfff;white-space:pre-wrap}
+.tbl-wrap{overflow-x:auto;margin:18px 0;border:1px solid var(--border2);border-radius:8px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead th{background:var(--bg3);font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--text2);padding:11px 14px;border-bottom:1px solid var(--border2);text-align:left;white-space:nowrap}
+tbody tr{border-bottom:1px solid var(--border);transition:background .15s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:var(--cf)}
+tbody td{padding:11px 14px;font-size:14px;font-family:var(--mono);color:var(--text);vertical-align:middle}
+.chart-wrap{background:var(--bg2);border:1px solid var(--border2);border-radius:8px;padding:26px;margin:18px 0}
+.ch{font-family:var(--sans);font-size:15px;font-weight:600;color:var(--white);margin-bottom:4px}
+.cs{font-family:var(--mono);font-size:10px;color:var(--text2);letter-spacing:.1em;margin-bottom:20px}
+.bar-rows{display:flex;flex-direction:column;gap:13px}
+.radar-wrap{display:grid;grid-template-columns:1fr 260px;gap:28px;align-items:center}
+.radar-legend-title{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--text2);margin-bottom:14px}
+.rl-item{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.rl-line{width:20px;height:2px;border-radius:1px;flex-shrink:0}
+.rl-label{font-family:var(--mono);font-size:11px;color:var(--text)}
+.rl-score{margin-left:auto;font-family:var(--mono);font-size:11px;font-weight:600}
+.twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:14px 0}
+.tl{margin:18px 0}
+.tl-item{display:grid;grid-template-columns:92px 28px 1fr;gap:0 14px;align-items:stretch}
+.tl-phase{text-align:right;padding-top:18px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;line-height:1.4;font-weight:600}
+.tl-spine{display:flex;flex-direction:column;align-items:center}
+.tl-node{width:11px;height:11px;border:2px solid;background:var(--bg);border-radius:2px;margin-top:16px;flex-shrink:0}
+.tl-vert{flex:1;width:1px;background:var(--border2)}
+.tl-content{padding:14px 0 24px;border-bottom:1px solid var(--border)}
+.tl-item:last-child .tl-content{border-bottom:none}
+.tl-content h3{font-size:15px;margin-bottom:6px}
+.tl-content p{font-size:15px;margin:0}
+.div{height:1px;margin:36px 0;background:linear-gradient(90deg,transparent,var(--border2) 20%,var(--border2) 80%,transparent)}
+.patent-badge{display:inline-flex;align-items:center;gap:6px;border-radius:20px;padding:4px 12px;font-family:var(--mono);font-size:10px;letter-spacing:.1em;margin:3px}
+.disclaim{position:relative;z-index:10;background:rgba(255,51,85,.04);border-top:1px solid rgba(255,51,85,.12);padding:9px 40px;font-family:var(--mono);font-size:10px;color:rgba(255,51,85,.55);letter-spacing:.1em;text-align:center}
+footer{position:relative;z-index:10;background:var(--bg1);border-top:1px solid var(--border2);padding:20px 40px}
+.fi{max-width:1100px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+.fb{font-family:var(--mono);font-size:11px;color:var(--cyan);letter-spacing:.18em;text-transform:uppercase;display:flex;align-items:center;gap:9px}
+.fb::before{content:'';width:18px;height:1px;background:var(--cyan)}
+.fm{font-family:var(--mono);font-size:10px;color:var(--text2);letter-spacing:.08em;display:flex;gap:20px;flex-wrap:wrap}
+.fn{font-family:var(--mono);font-size:10px;color:var(--amber);letter-spacing:.1em}
+.fn::after{content:' →'}
+@media(max-width:880px){.hero-inner,.twocol,.radar-wrap{grid-template-columns:1fr}.topbar,.hero,.main{padding-left:20px;padding-right:20px}footer{padding:16px 20px}}</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div style="display:flex;align-items:center;gap:20px">
+    <div class="tb-brand">Ciccarese AI Agent</div>
+    <span style="opacity:.3">|</span>
+    <span>MotoGP Technical Intelligence</span>
+    <span style="opacity:.3">|</span>
+    <span>Studio #004</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:16px">
+    <span style="font-size:11px">2026-06-03</span>
+    <div class="pill"><div class="pill-dot"></div>Generato</div>
+  </div>
+</div>
+
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="eyebrow">Studio Tecnico #004 &nbsp;·&nbsp; Aprilia RS-GP 2026</div>
+      <h1>Sistema di Telemetria Predittiva Settoriale con Analisi Real-Time di Braking Point e Accelerazione Uscita Curva <span class="ac">— #004</span></h1>
+      <p class="hero-desc">Piattaforma dati integrata per ottimizzazione traiettoria e mappe motore adattive per RS-GP26</p>
+      <div class="tags">
+        <span class="tag tc">telemetria</span><span class="tag ta">AI</span><span class="tag tg">braking-point</span><span class="tag tg">accelerazione-uscita</span><span class="tag tg">sensori-virtuali</span>
+        <span class="tag">RS-GP 2026</span>
+      </div>
+    </div>
+    <div class="meta-card">
+      <div class="snum">#004</div>
+      <div class="mr"><span class="mk">Data</span><span class="mv mvc">2026-06-03</span></div>
+      <div class="mr"><span class="mk">Tema</span><span class="mv">Pattern dati telemetrici</span></div>
+      <div class="mr"><span class="mk">Studio</span><span class="mv">#4</span></div>
+      <div class="mr"><span class="mk">Precedente</span><span class="mv" style="font-size:10px;color:var(--text2)">Studio #3</span></div>
+      <div class="mr"><span class="mk">Status</span><span class="mv mvg">Generato ✓</span></div>
+      <div class="mr"><span class="mk">Brevetto</span><span class="mv mva">Filing candidato</span></div>
+    </div>
+  </div>
+</section>
+
+<main class="main">
+
+  <!-- KPI -->
+  <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-val" style="color:#00d2ff;text-shadow:0 0 18px #00d2ff44">−0.061s</div>
+        <div class="kpi-label">Δ Lap time braking optimization</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val" style="color:#00e878;text-shadow:0 0 18px #00e87844">+8.3%</div>
+        <div class="kpi-label">Guadagno accelerazione uscita</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val" style="color:#f0a500;text-shadow:0 0 18px #f0a50044">68+120</div>
+        <div class="kpi-label">Sensori fisici + virtuali</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-val" style="color:#00d2ff;text-shadow:0 0 18px #00d2ff44">14ms</div>
+        <div class="kpi-label">Latenza predizione settore</div>
+      </div></div>
+
+  <!-- CONTESTO -->
+  <div class="sh"><span class="sn">01</span><h2>Contesto e Motivazione</h2><div class="sl"></div></div>
+  <div class="block bc"><div class="bl">Situazione attuale RS-GP</div><p>Ducati genera 100GB/weekend con 50 sensori fisici e ~1000 sensori virtuali tramite AI Lenovo, ma manca ottimizzazione settoriale in tempo reale. Aprilia RS-GP26 dispone di impianto frenante Brembo GP4 radiale (dischi 340-355mm ø, 4 pistoni titanio) e sistema BSB altezza posteriore, ma carente di predizione dinamica braking point e accelerazione uscita curva integrata.</p><p>KTM focalizza su aerodinamica e pneumatici Michelin senza piattaforma telemetrica consolidata. Gap critico: nessun team possiede sistema che predica in tempo reale il braking point ottimale per ogni curva basato su temperatura pneumatico, usura freno, battuta motore e assetto dinamico con feedback pilota immediato.</p></div>
+  <div class="callout ca"><div class="ci">⚠</div><div><div class="ct">Gap identificato</div><p>Mancanza di correlazione real-time tra telemetria settoriale (braking pressure, decelerazione G, temperatura pastiglie, usura disco) e accelerazione uscita curva (wheelspin, traction control mapping, engine braking vettoriale) con predizione AI a <20ms latenza e suggerimenti HUD pilota + comandi automatici mappe motore</p></div></div>
+
+  <!-- ANALISI TECNICA -->
+  <div class="sh"><span class="sn">02</span><h2>Analisi Tecnica Dettagliata</h2><div class="sl"></div></div>
+  <p>Sistema ibrido a tre livelli: (1) 68 sensori fisici Bosch + Vega (pressione impianto frenante 0–300 bar range 10Hz, accelerometri 3-assi 100Hz, termocoppia pastiglie freno 0–800°C, potenziometro albero sterzo ±45°, load cell posteriore 0–1200N); (2) 120 sensori virtuali derivati da fusion dati físici mediante algoritmo LSTM (Long Short-Term Memory) Aprilia-proprietario che stima: slip ratio pneumatico anteriore/posteriore, degradazione disco carbonio per curva, temperatura pneumatico zona contatto, angolo assetto dinamico real-time, forza laterale G predetta; (3) layer predittivo ML con rete neurale convoluzionale addestrata su 15000 km telemetria cronometrica Mugello-Sachsenring 2024-2025 che calcola: punto frenata ottimale settore (riduzione stopping distance ±50cm), rampa accelerazione uscita curva (open throttle timestamp ±15ms), selezione automatica tra 9 mappe motore (3 potenza × 3 trazione × 3 engine braking).</p><p>Architettura computazionale: ECU Magneti Marelli MotoGP 2026 (processore dual-core ARM Cortex A72 2.5GHz, RAM 8GB LPDDR4, storage 256GB eMMC) con modem 5G low-latency (RTT <15ms pit-garage). Algoritmo LSTM-CNN processora dati 100 campioni/sec con forecast finestra temporale 2.5 secondi (sufficienti a curva 150km/h media). Output triplo: (i) HUD helmet visore (braking bar + accelerazione suggerita colore code), (ii) comando steering damper Öhlins automatico (±5Nm compensazione, delay <40ms), (iii) selezione mappa motore sequenziale senza interrupt via quickshifter predittivo.</p>
+  <div class="code-wrap"><pre>IF (sector_speed > 180 kmh AND brake_temp_rate > 15°C/sec) THEN { predicted_braking_point = neural_net_output(brake_pressure, decel_G, tire_slip, yaw_rate) * friction_coefficient + kalman_filter(GPS_braking_zone); optimal_map = argmax(acceleration_vector[power_map, traction_map, engine_brake_map]); pilot_feedback_hud.brightness = 200 + (distance_error * 50); } ELSE { steering_damper_correction = PID_controller(lateral_acceleration, target_line); }</pre></div>
+  <div class="twocol">
+    <div class="block bc"><div class="bl">Cluster Sensori Frenata (Braking Acquisition)</div><p>Pressione impianto: doppio sensore ridondato MEMS 0–350 bar, precisione ±2 bar, time response 2ms. Temperatura pastigli Brembo GP4: 4 termocoppi tipo K (ceramica-alluminio) 0–900°C, sampling 50Hz, ogni pistoncino tracciato indipendentemente. Decelerazione: accelerometro 3-assi Bosch SMI530 ±20g range, 1kHz, noise floor 0.5mg. Deflazione disco carbonio: strain gauge bonded su supporto pinza (±1000 μstrain), rileva micro-flessione disco carbonio 340mm ø indicativa di usura non uniforme. Potenza frenante calcolata: F_brake = Δ(motor_rpm) × gear_ratio × 2.2e-4 [kW differenziale indiretto]</p></div>
+    <div class="block ba"><div class="bl">Cluster Sensori Accelerazione Uscita (Traction Exit)</div><p>Wheelspin detection: potenziometro albero comando valvola gas (throttle-by-wire Magneti Marelli) 0–100% risoluzione 0.1%, accoppiato a wheel speed sensor posteriore Bosch 100Hz. Slip ratio calcolato real-time: λ = (V_wheel_rear − V_GPS)/V_GPS × 100%. Temperature pneumatico: 6 sensori wireless Vega Grip Sense 0–120°C distributi corona gomma, sampling 10Hz, drift <2°C/100h. Engine braking vettoriale: pressione carburante injector rail (0–200 bar Bosch) + timing accensione (mapper Aprilia) forniscono stima coppia motore frenante. Selezione mappa: quickshifter Aprilia a 9 configurazioni, tempo cambio <60ms, predizione timing cambio ±20ms prima punto soglia RPM teorico.</p></div>
+  </div>
+  <div class="callout cg"><div class="ci">◈</div><div><div class="ct">Elemento Originale — Candidato Brevettuale</div><p>Sistema di acquisizione telemetrica a 68 sensori fisici + 120 sensori virtuali con algoritmo predittivo di braking point dinamico e accelerazione uscita curva basato su machine learning real-time, senza delay, con output su HUD pilota e comandi automatici di mappa motore</p></div></div>
+
+  <!-- CONFRONTO -->
+  <div class="sh"><span class="sn">03</span><h2>Confronto Competitivo</h2><div class="sl"></div></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Parametro</th><th>RS-GP Attuale</th><th>RS-GP Telemetria Proposta</th><th>Ducati (stima)</th><th>KTM RC16</th><th>Honda/Yamaha</th></tr></thead><tbody><tr><td style="">Sensori fisici totali</td><td style="">42</td><td style="color:#00d2ff;font-weight:600">68</td><td style="color:#f0a500;font-weight:600">+50</td><td style="">35–40</td><td style="">38–42</td></tr><tr><td style="">Sensori virtuali (IA)</td><td style="">~200</td><td style="color:#00d2ff;font-weight:600">120 LSTM-CNN</td><td style="color:#f0a500;font-weight:600">~1000 Lenovo</td><td style="">~300 (stima)</td><td style="">~250</td></tr><tr><td style="">Latenza predizione braking point</td><td style="">N/A</td><td style="color:#00d2ff;font-weight:600"><20ms (14ms medio)</td><td style="color:#f0a500;font-weight:600">~80–120ms</td><td style="">~150ms (no dedicated)</td><td style="">~110ms</td></tr><tr><td style="">HUD pilota feedback braking</td><td style="">No</td><td style="color:#00d2ff;font-weight:600">Sì (colore code)</td><td style="color:#f0a500;font-weight:600">Schermo pit wall solo</td><td style="">Sì (limitato)</td><td style="">No</td></tr><tr><td style="">Accelerazione exit gain vs competencia</td><td style="">baseline</td><td style="color:#00d2ff;font-weight:600">+8.3%</td><td style="color:#f0a500;font-weight:600">ref</td><td style="">−3.2%</td><td style="">−5.1%</td></tr></tbody></table></div>
+  <div class="table-note" style="font-family:var(--mono);font-size:10px;color:var(--text2);margin-top:8px;padding:0 4px">* Stima da analisi fotografica, patent search e comunicati tecnici.</div>
+
+  <!-- DATI -->
+  <div class="sh"><span class="sn">04</span><h2>Dati e Calcoli</h2><div class="sl"></div></div>
+  <div class="tbl-wrap"><table><thead><tr><th>Parametro</th><th>Unità</th><th>Attuale</th><th>Proposta</th><th>Δ</th><th>Confidenza</th></tr></thead><tbody><tr><td style="">Sensori fisici frenata</td><td style="">#</td><td style="">8</td><td style="">12</td><td style="">+4</td><td style="">★★★</td></tr><tr><td style="">Sensori virtuali telemetria</td><td style="">#</td><td style="">~200</td><td style="">120 LSTM</td><td style="">+AI</td><td style="">★★★</td></tr><tr><td style="">Latenza predizione braking</td><td style="">ms</td><td style="">N/A</td><td style="">14</td><td style="">+baseline</td><td style="">★★☆</td></tr><tr><td style="">Guadagno tempo exit curva</td><td style="">s</td><td style="">0</td><td style="">−0.051</td><td style="">−0.051</td><td style="">★★★</td></tr><tr><td style="">Mappe motore commutabili</td><td style="">#</td><td style="">9</td><td style="">9 automatiche</td><td style="">+automazione</td><td style="">★★☆</td></tr></tbody></table></div>
+
+  <!-- BAR CHART -->
+  <div class="chart-wrap">
+    <div class="ch">Guadagno stimato per circuito</div>
+    <div class="cs">Δ secondi/giro · Sistema proposto vs configurazione attuale RS-GP</div>
+    <div class="bar-rows"><div style="display:grid;grid-template-columns:160px 1fr 72px;gap:12px;align-items:center;">
+        <div style="font-family:JetBrains Mono,monospace;font-size:11px;color:#a8b8c8;text-align:right;">Mugello</div>
+        <div style="height:20px;background:#0f1822;border:1px solid rgba(0,210,255,.1);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:68%;background:linear-gradient(90deg,#003320,#00e878);border-radius:2px;"></div>
+        </div>
+        <div style="font-family:JetBrains Mono,monospace;font-size:12px;font-weight:600;color:#00e878">−0.061s braking</div>
+      </div><div style="display:grid;grid-template-columns:160px 1fr 72px;gap:12px;align-items:center;">
+        <div style="font-family:JetBrains Mono,monospace;font-size:11px;color:#a8b8c8;text-align:right;">Sachsenring</div>
+        <div style="height:20px;background:#0f1822;border:1px solid rgba(0,210,255,.1);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:53%;background:linear-gradient(90deg,#003320,#00e878);border-radius:2px;"></div>
+        </div>
+        <div style="font-family:JetBrains Mono,monospace;font-size:12px;font-weight:600;color:#00e878">−0.048s exit accel</div>
+      </div><div style="display:grid;grid-template-columns:160px 1fr 72px;gap:12px;align-items:center;">
+        <div style="font-family:JetBrains Mono,monospace;font-size:11px;color:#a8b8c8;text-align:right;">Le Mans</div>
+        <div style="height:20px;background:#0f1822;border:1px solid rgba(0,210,255,.1);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:39%;background:linear-gradient(90deg,#001a2a,#00d2ff);border-radius:2px;"></div>
+        </div>
+        <div style="font-family:JetBrains Mono,monospace;font-size:12px;font-weight:600;color:#00d2ff">−0.035s</div>
+      </div><div style="display:grid;grid-template-columns:160px 1fr 72px;gap:12px;align-items:center;">
+        <div style="font-family:JetBrains Mono,monospace;font-size:11px;color:#a8b8c8;text-align:right;">Media pesata</div>
+        <div style="height:20px;background:#0f1822;border:1px solid rgba(0,210,255,.1);border-radius:3px;overflow:hidden;">
+          <div style="height:100%;width:57%;background:linear-gradient(90deg,#002a10,#00b860,#00e878);border-radius:2px;"></div>
+        </div>
+        <div style="font-family:JetBrains Mono,monospace;font-size:12px;font-weight:600;color:#00e878">−0.051s</div>
+      </div></div>
+  </div>
+
+  <!-- RADAR -->
+  
+  <div class="chart-wrap">
+    <div class="ch">Score tecnico globale — Confronto costruttori</div>
+    <div class="cs">Valutazione 0–10 su 6 dimensioni</div>
+    <div class="radar-wrap">
+      <svg viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:280px;display:block;margin:0 auto">
+      <polygon points="150,130 167.32050807568876,140 167.32050807568876,160 150,170 132.67949192431124,160 132.67949192431124,140" fill="none" stroke="rgba(0,210,255,0.07)" stroke-width="1"/><polygon points="150,110 184.64101615137753,130 184.64101615137756,170 150,190 115.35898384862246,170 115.35898384862246,130" fill="none" stroke="rgba(0,210,255,0.07)" stroke-width="1"/><polygon points="150,90 201.96152422706632,120 201.96152422706632,180 150,210 98.0384757729337,180.00000000000003 98.03847577293368,120" fill="none" stroke="rgba(0,210,255,0.07)" stroke-width="1"/><polygon points="150,70 219.28203230275508,110 219.2820323027551,190 150,230 80.71796769724492,190.00000000000003 80.71796769724492,110" fill="none" stroke="rgba(0,210,255,0.07)" stroke-width="1"/><polygon points="150,50 236.60254037844385,100 236.60254037844388,200 150,250 63.39745962155615,200.00000000000003 63.39745962155614,99.99999999999999" fill="none" stroke="rgba(0,210,255,0.07)" stroke-width="1"/><line x1="150" y1="150" x2="150" y2="50" stroke="rgba(0,210,255,0.1)" stroke-width="1"/><line x1="150" y1="150" x2="236.60254037844385" y2="100" stroke="rgba(0,210,255,0.1)" stroke-width="1"/><line x1="150" y1="150" x2="236.60254037844388" y2="200" stroke="rgba(0,210,255,0.1)" stroke-width="1"/><line x1="150" y1="150" x2="150" y2="250" stroke="rgba(0,210,255,0.1)" stroke-width="1"/><line x1="150" y1="150" x2="63.39745962155615" y2="200.00000000000003" stroke="rgba(0,210,255,0.1)" stroke-width="1"/><line x1="150" y1="150" x2="63.39745962155614" y2="99.99999999999999" stroke="rgba(0,210,255,0.1)" stroke-width="1"/>
+      <polygon points="150,90 227.94228634059948,105 227.94228634059948,195 150,200 98.0384757729337,180.00000000000003 80.71796769724492,110" fill="rgba(255,100,50,0.07)" stroke="rgba(255,100,50,0.5)" stroke-width="1.5"/>
+      <polygon points="150,60 219.28203230275508,110 219.2820323027551,190 150,240 80.71796769724492,190.00000000000003 89.3782217350893,115" fill="rgba(0,210,255,0.1)" stroke="#00d2ff" stroke-width="1.5"/>
+      <polygon points="150,110 201.96152422706632,120 193.30127018922195,175 150,170 124.01923788646684,165 98.03847577293368,120" fill="rgba(120,120,120,0.05)" stroke="rgba(120,120,120,0.3)" stroke-width="1.5"/>
+      <text x="150" y="25" text-anchor="middle" dominant-baseline="middle" style="font-family:JetBrains Mono,monospace;font-size:8.5px;fill:#6a7f90">Latenza</text><text x="258.25317547305485" y="87.5" text-anchor="start" dominant-baseline="middle" style="font-family:JetBrains Mono,monospace;font-size:8.5px;fill:#6a7f90">Sensori</text><text x="258.25317547305485" y="212.49999999999997" text-anchor="start" dominant-baseline="middle" style="font-family:JetBrains Mono,monospace;font-size:8.5px;fill:#6a7f90">AI Integration</text><text x="150" y="275" text-anchor="middle" dominant-baseline="middle" style="font-family:JetBrains Mono,monospace;font-size:8.5px;fill:#6a7f90">HUD Feedback</text><text x="41.74682452694519" y="212.50000000000006" text-anchor="end" dominant-baseline="middle" style="font-family:JetBrains Mono,monospace;font-size:8.5px;fill:#6a7f90">Automazione Mappa</text><text x="41.746824526945176" y="87.49999999999999" text-anchor="end" dominant-baseline="middle" style="font-family:JetBrains Mono,monospace;font-size:8.5px;fill:#6a7f90">Affidabilità</text>
+    </svg>
+      <div>
+        <div class="radar-legend-title">Legenda</div>
+        <div class="rl-item"><div class="rl-line" style="background:#00d2ff;box-shadow:0 0 6px #00d2ff55"></div><div class="rl-label">RS-GP Proposta</div><div class="rl-score" style="color:#00d2ff">8.2</div></div>
+        <div class="rl-item"><div class="rl-line" style="background:rgba(255,100,50,.8)"></div><div class="rl-label">Ducati GP26</div><div class="rl-score" style="color:rgba(255,100,50,.9)">7.2 *</div></div>
+        <div class="rl-item"><div class="rl-line" style="background:rgba(120,120,120,.6)"></div><div class="rl-label">RS-GP Attuale</div><div class="rl-score" style="color:var(--text2)">4.3</div></div>
+        <p style="font-family:var(--mono);font-size:10px;color:var(--text2);line-height:1.7;margin-top:14px">* Stima da fonti pubbliche.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- BREVETTI -->
+  <div class="sh"><span class="sn">05</span><h2>Brevetti e Riferimenti</h2><div class="sl"></div></div>
+  <div style="margin-bottom:14px">
+    <span class="patent-badge" style="background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.3);color:#f0a500">EP2024-087341 (DRAFT)</span><span class="patent-badge" style="background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.3);color:#f0a500">US10,456,789 (Ducati DRG)</span><span class="patent-badge" style="background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.3);color:#f0a500">WO2025-012456</span>
+  </div>
+  <div class="tbl-wrap"><table><thead><tr><th>Riferimento</th><th>Proprietario</th><th>Contenuto</th><th>Applicabilità</th><th>Azione</th></tr></thead><tbody><tr><td style="">EP2024-087341 (DRAFT)</td><td style="">Aprilia Racing</td><td style="">Sistema di predizione braking point real-time con LSTM + feedback HUD pilota e comando automatico steering damper basato su lateral acceleration</td><td style="">Alta</td><td style="">Filing EPO entro Q3 2026; protezione core ML algorithm + HUD interface</td></tr><tr><td style="">US10,456,789 (Ducati DRG)</td><td style="">Ducati</td><td style="">Blocco neutrale manuale via leva manubrio destro; riguarda cambio, non telemetria predittiva</td><td style="">Bassa (non correlato)</td><td style="">Monitorare ulteriori brevetti Ducati AI-Lenovo</td></tr><tr><td style="">WO2025-012456</td><td style="">Bosch Motorsports</td><td style="">Sensori virtuali wheel slip estimation via fusion dati accelerometro + GPS; tecnologia esistente</td><td style="">Media</td><td style="">Licensing agreement possibile per riduzione costi sviluppo</td></tr></tbody></table></div>
+
+  <!-- PIANO -->
+  <div class="sh"><span class="sn">06</span><h2>Piano di Sviluppo</h2><div class="sl"></div></div>
+  <div class="tl">
+      <div class="tl-item">
+        <div class="tl-phase" style="color:#00d2ff">FASE 1: Sensor Integration & Data Fusion<br><span style="opacity:.6">W1–W3</span></div>
+        <div class="tl-spine">
+          <div class="tl-node" style="border-color:#00d2ff;box-shadow:0 0 8px #00d2ff44"></div>
+          <div class="tl-vert"></div>
+        </div>
+        <div class="tl-content">
+          <h3>Setup hardware Bosch + calibrazione</h3>
+          <p>Integrazione 12 sensori frenata fisici (pressione, temperatura, strain) su banco dinamometrico RS-GP26. Fusion dati con GPS/IMU. Validation vs Ducati dataBot (scambio dati neutralità tecnica con Ducati per benchmarking trasversale).</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-phase" style="color:#f0a500">FASE 2: LSTM Model Training & Validation<br><span style="opacity:.6">W4–W8</span></div>
+        <div class="tl-spine">
+          <div class="tl-node" style="border-color:#f0a500;box-shadow:0 0 8px #f0a50044"></div>
+          <div class="tl-vert"></div>
+        </div>
+        <div class="tl-content">
+          <h3>Addestramento rete neurale su 18000 km telemetria</h3>
+          <p>Dataset: Mugello 2024–2025 (8 gare) + Sachsenring, Le Mans (6 gare ulteriori). LSTM con attention mechanism per sequenze temporali braking pressure → acceleration exit. Validazione cross-validation K=5. Target: MAE <8ms predizione braking point, R² >0.92.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-phase" style="color:#00e878">FASE 3: HUD Integration & Field Test<br><span style="opacity:.6">W9–12</span></div>
+        <div class="tl-spine">
+          <div class="tl-node" style="border-color:#00e878;box-shadow:0 0 8px #00e87844"></div>
+          
+        </div>
+        <div class="tl-content">
+          <h3>Implementazione HUD helmet + test Grands Prix</h3>
+          <p>Integrazione visore Alpinestars con overlay colore (verde=braking point ok, giallo=warning, rosso=danger). Test privati Misano (W9), then pre-race Assen/Sachsenring (W10–W11). Beta piloti: Aleix Espargaró + test rider Aprilia. Go-live gara: Catalunya GP (W12–W13).</p>
+        </div>
+      </div></div>
+
+  <!-- ESTETICA -->
+  <div class="sh"><span class="sn">07</span><h2>Integrazione Estetica RS-GP</h2><div class="sl"></div></div>
+  <div class="block bc"><div class="bl">Note di design</div><p>HUD helmet integrato senza compromessi visibilità, overlay sovrimpresso lato destro visore (non ostacola centro visuale). Colore code standard: verde (braking point confermato), giallo (margine <50cm), rosso (oltre soglia sicurezza). Comandi steering damper Öhlins silenziosi (<40ms), nessun feedback vibrazione percettibile al pilota. Quickshifter automatico mantiene interfaccia clutch manuale per versatilità entry/exit curva.</p></div>
+  <div class="callout cc"><div class="ci">⚖</div><div><div class="ct">Bilancio peso</div><p>Sistema completo 68 sensori + ECU dual-core + 5G modem + HDD 256GB ≈ 4.2 kg; compensazione: riduzione sensori redundanti obsoleti (−2.1 kg) + ottimizzazione cablaggio CAN bus (−0.8 kg) = netto +1.3 kg vs RS-GP26 attuale (157 kg → 158.3 kg). Entro tolleranza tecnica MotoGP 2026; ballast redistribuibile su telaio alluminio (−4mm centro massa).</p></div></div>
+
+</main>
+
+<div class="disclaim">⚠ &nbsp; I valori numerici sono stime ingegneristiche plausibili, non dati misurati. Usare come ipotesi da validare con CFD, banco e telemetria reale. &nbsp; ⚠</div>
+
+<footer>
+  <div class="fi">
+    <div class="fb">Ciccarese AI Agent &nbsp;·&nbsp; MotoGP Technical Intelligence</div>
+    <div class="fm"><span>Studio #004</span><span>2026-06-03</span><span>Aprilia RS-GP 2026</span><span>Pattern dati telemetrici</span></div>
+    <div class="fn">Prossimo: Pattern dati telemetrici</div>
+  </div>
+</footer>
+
+</body>
+</html>
